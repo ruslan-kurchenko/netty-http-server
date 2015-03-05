@@ -1,4 +1,4 @@
-package com.henko.server;
+package com.henko.server.handler;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -20,6 +20,7 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel>{
         ChannelPipeline p = ch.pipeline();
         if (sslCtx != null) p.addLast(sslCtx.newHandler(ch.alloc()));
         p.addLast(new HttpServerCodec());
-        p.addLast(new HttpServerHandler());
+        //p.addLast(new HttpServerHandler());
+        p.addLast(new HttpMVCHandler());
     }
 }

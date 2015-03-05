@@ -1,4 +1,4 @@
-package com.henko.server;
+package com.henko.server.handler;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -34,7 +34,12 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
         if (is100ContinueExpected(req)) {
             ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
         }
+        
+        /* The client SHOULD continue with its request.                                    */
+        /* This interim response is used to inform the client that the initial part        */ 
+        /* of the request has been received and has not yet been rejected by the server.   */
         boolean keepAlive = isKeepAlive(req);
+        
         FullHttpResponse resp = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.copiedBuffer(PAGE_HELLO, getContentCharset() ));
         resp.headers().set(CONTENT_TYPE, "text/html");
         resp.headers().set(CONTENT_LENGTH, getContentLength(resp));
@@ -54,6 +59,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     private Charset getContentCharset () {
         return Charset.forName(CONTENT_CHARSET);
     }
+    
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();

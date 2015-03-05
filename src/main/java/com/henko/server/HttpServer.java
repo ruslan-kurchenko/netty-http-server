@@ -1,5 +1,6 @@
 package com.henko.server;
 
+import com.henko.server.handler.HttpServerInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
