@@ -91,7 +91,7 @@ public class TestH2RedirectInfoDao {
     @Test
     public void testPersist(){
         int expectedId = 4;
-        int actualId = redirectInfoDao.persist("w3school.com");
+        int actualId = redirectInfoDao.persistRedirectInfo("w3school.com");
 
         assertEquals(expectedId, actualId);
     }

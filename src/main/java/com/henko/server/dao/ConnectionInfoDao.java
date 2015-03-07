@@ -7,13 +7,15 @@ import java.util.List;
 
 public interface ConnectionInfoDao {
 
-    public ConnectionInfo selectById();
+    public ConnectionInfo selectById(int id);
+
+    public ConnectionInfo selectByTimeStamp(long timeStamp);
 
     public List<ConnectionInfo> selectAll();
 
     public List<UniqueRequestInfo> selectUniqueRequestInfo();
 
-    public int insertConnectionInfo();
+    public int insertConnectionInfo(ConnectionInfo connectionInfo);
 
     public boolean deleteConnectionInfo();
 

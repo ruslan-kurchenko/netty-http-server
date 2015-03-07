@@ -20,7 +20,6 @@ public class H2RedirectInfoDao implements RedirectInfoDao{
 
     @Override
     public RedirectInfo selectById(int id) {
-        RedirectInfo info = null;
         String selectStr = "SELECT * FROM REDIRECTS WHERE ID_REDIRECT = ?;";
 
         Connection conn = pool.getConnection();
@@ -29,18 +28,11 @@ public class H2RedirectInfoDao implements RedirectInfoDao{
         try {
             stmt = conn.prepareStatement(selectStr);
             stmt.setInt(1, id);
-
             rs = stmt.executeQuery();
-            String url = null;
-            int count = 0;
-            while(rs.next()){
-                url = rs.getString(2);
-                count = rs.getInt(3);
-            }
 
-            if (redirectNotFound(url)) return null;
+            if (isEmpty(rs)) return null;
 
-            info = new RedirectInfo(id, url, count);
+            return parseRedirectInfo(id, rs);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -49,7 +41,18 @@ public class H2RedirectInfoDao implements RedirectInfoDao{
             close(conn);
         }
 
-        return info;
+        return null;
+    }
+
+    private boolean isEmpty(ResultSet rs) throws SQLException {
+        return !rs.next();
+    }
+
+    private RedirectInfo parseRedirectInfo(int id, ResultSet rs) throws SQLException {
+        String url = rs.getString(2);
+        int count = rs.getInt(3);
+
+        return new RedirectInfo(id, url, count);
     }
 
     @Override
@@ -95,7 +98,7 @@ public class H2RedirectInfoDao implements RedirectInfoDao{
     }
 
     @Override
-    public int persist(String url) {
+    public int persistRedirectInfo(String url) {
         String insertStr = "INSERT INTO REDIRECTS (URL, R_COUNT) VALUES(?, 1);";
 
         Connection conn = pool.getConnection();
@@ -202,7 +205,6 @@ public class H2RedirectInfoDao implements RedirectInfoDao{
 
     @Override
     public List<RedirectInfo> selectAll() {
-        List<RedirectInfo> infoList = new ArrayList<>();
         String selectStr = "SELECT * FROM REDIRECTS;";
 
         Connection conn = pool.getConnection();
@@ -210,16 +212,11 @@ public class H2RedirectInfoDao implements RedirectInfoDao{
         ResultSet rs = null;
         try {
             stmt = conn.createStatement();
-
             rs = stmt.executeQuery(selectStr);
-            while(rs.next()){
-                int id = rs.getInt(1);
-                String url = rs.getString(2);
-                int count = rs.getInt(3);
 
-                infoList.add(new RedirectInfo(id, url, count));
-            }
+            if (isEmpty(rs)) return null;
 
+            return parseRedirectInfoList(rs);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -228,11 +225,19 @@ public class H2RedirectInfoDao implements RedirectInfoDao{
             close(conn);
         }
 
-        if (isResultEmpty(infoList)) return null;
-        return infoList;
+        return null;
     }
 
-    private boolean isResultEmpty(List<RedirectInfo> infoList) {
-        return infoList.size() == 0;
+    private List<RedirectInfo> parseRedirectInfoList(ResultSet rs) throws SQLException {
+        List<RedirectInfo> infoList = new ArrayList<>();
+        do {
+            int id = rs.getInt(1);
+            String url = rs.getString(2);
+            int count = rs.getInt(3);
+
+            infoList.add(new RedirectInfo(id, url, count));
+        } while(rs.next());
+
+        return infoList;
     }
 }

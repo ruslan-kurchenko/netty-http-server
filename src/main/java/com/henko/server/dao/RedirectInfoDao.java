@@ -10,7 +10,7 @@ public interface RedirectInfoDao {
 
     public RedirectInfo selectByUrl(String url);
 
-    public int persist(String url);
+    public int persistRedirectInfo(String url);
 
     public boolean increaseCountByUrl(String url);
 
