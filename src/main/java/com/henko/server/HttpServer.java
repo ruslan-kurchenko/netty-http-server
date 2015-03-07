@@ -12,6 +12,9 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 
+import javax.net.ssl.SSLException;
+import java.security.cert.CertificateException;
+
 
 public class HttpServer {
     final static boolean SSL = System.getProperty("ssl") != null;
@@ -19,15 +22,7 @@ public class HttpServer {
 
     public static void main(String[] args) throws Exception {
         // Configure SSL
-        final SslContext sslCtx;
-        if (SSL) {
-            SelfSignedCertificate ssc = new SelfSignedCertificate();
-
-            // .certificate() - certificate file| .privateKey() - private key in RSA format
-            sslCtx = SslContext.newServerContext(ssc.certificate(), ssc.privateKey());
-        } else {
-            sslCtx = null;
-        }
+        final SslContext sslCtx = configureSslContext();
 
         // Configure the server
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -50,5 +45,18 @@ public class HttpServer {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
+    }
+
+    private static SslContext configureSslContext() throws CertificateException, SSLException {
+        SslContext sslCtx;
+        if (SSL) {
+            SelfSignedCertificate ssc = new SelfSignedCertificate();
+
+            // .certificate() - certificate file| .privateKey() - private key in RSA format
+            sslCtx = SslContext.newServerContext(ssc.certificate(), ssc.privateKey());
+        } else {
+            sslCtx = null;
+        }
+        return sslCtx;
     }
 }

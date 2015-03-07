@@ -1,14 +1,12 @@
 package com.henko.server.controller;
 
-import com.henko.server.domain.MockServerStatus;
-import com.henko.server.view.pages.impl.ErrorPage;
-import com.henko.server.view.pages.impl.HelloPage;
-import com.henko.server.view.pages.impl.StatusPage;
+import com.henko.server.view.impl.ErrorPage;
+import com.henko.server.view.impl.HelloPage;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.Charset;
 
-import static com.henko.server.view.PageRegistry.*;
+import static com.henko.server.controller.PageRegistry.*;
 
 public class Controller {
     
@@ -22,7 +20,7 @@ public class Controller {
     }
 
     private ByteBuf processPageStatus(Charset charset) {
-        return new StatusPage(new MockServerStatus()).getContent(charset);
+        return null;
     }
 
     private ByteBuf processPageHello(Charset charset) {

@@ -1,17 +1,17 @@
-package com.henko.server.domain.records;
+package com.henko.server.domain;
 
 import java.util.Date;
 
-public class FirstTableRecord {
+public class UniqueRequestInfo {
     private String ip;
     private int count;
     private Date lastConn;
 
-    public FirstTableRecord() {
+    public UniqueRequestInfo() {
         
     }
 
-    public FirstTableRecord(String ip, int count, Date lastConn) {
+    public UniqueRequestInfo(String ip, int count, Date lastConn) {
         this.ip = ip;
         this.count = count;
         this.lastConn = lastConn;

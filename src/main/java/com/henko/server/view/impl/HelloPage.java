@@ -1,6 +1,6 @@
-package com.henko.server.view.pages.impl;
+package com.henko.server.view.impl;
 
-import com.henko.server.view.pages.Page;
+import com.henko.server.view.Page;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 

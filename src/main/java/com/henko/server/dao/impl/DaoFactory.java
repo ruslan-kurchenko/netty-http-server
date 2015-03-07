@@ -1,13 +1,15 @@
 package com.henko.server.dao.impl;
 
-import com.henko.server.dao.GenericDao;
-import com.henko.server.model.ConnectionInfo;
+
+import com.henko.server.dao.ConnectionInfoDao;
+import com.henko.server.dao.RedirectInfoDao;
 
 public abstract class DaoFactory {
     
     public static final String H2 = "h2";
     
-    public abstract GenericDao<ConnectionInfo> getConnectionInfoDao();
+    public abstract ConnectionInfoDao getConnectionInfoDao();
+    public abstract RedirectInfoDao getRedirectInfoDao();
     
     public static DaoFactory getDaoFactory(String type) {
         switch (type) {

@@ -1,10 +1,7 @@
-package com.henko.server.view.pages.impl;
+package com.henko.server.view.impl;
 
 import com.henko.server.domain.ServerStatus;
-import com.henko.server.domain.records.FirstTableRecord;
-import com.henko.server.domain.records.SecondTableRecord;
-import com.henko.server.domain.records.ThirdTableRecord;
-import com.henko.server.view.pages.Page;
+import com.henko.server.view.Page;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -35,9 +32,9 @@ public class StatusPage implements Page {
                 "    <div class=\"container\">\n" +
                 "        <h2 style=\"text-align: center; \">SERVER STATUS</h2>\n" +
                 "        <div class=\"top-info\">\n" +
-                "            The total number of requests            - " + status.getAllRequests() + " <br>\n" +
-                "            The number of unique queries            - " + status.getUniqueRequests() + "<br>\n" +
-                "            The number of connections at the moment - " + status.getCurrentConnections() + "<br>\n" +
+//                "            The total number of requests            - " + status.getAllRequests() + " <br>\n" +
+//                "            The number of unique queries            - " + status.getUniqueRequests() + "<br>\n" +
+//                "            The number of connections at the moment - " + status.getCurrentConnections() + "<br>\n" +
                 "            <hr>\n" +
                 "        </div>\n" +
                 
@@ -46,7 +43,7 @@ public class StatusPage implements Page {
                 "            <table border=\"1\">\n" +
                 "                <caption>Table of count for certain IP connection</caption>\n" +
                 "                <tr><th>IP</th><th>number of connection</th><th>last connection</th></tr>\n" +
-                firstTableData() +
+//                firstTableData() +
                 "            </table>\n" +
                 "            <hr>\n" +
                 "        </div>\n" +
@@ -56,7 +53,7 @@ public class StatusPage implements Page {
                 "            <table border=\"1\">\n" +
                 "                <caption>Table of count for certain redirection</caption>\n" +
                 "                <tr><th>URL</th><th>number of redirection</th></tr>\n" +
-                secondTableData() +
+//                secondTableData() +
                 "            </table>\n" +
                 "            \n" +
                 "            <hr>\n" +
@@ -74,7 +71,7 @@ public class StatusPage implements Page {
                 "                    <th>Received Bytes</th>\n" +
                 "                    <th>Speed (byte/sec)</th>\n" +
                 "                </tr>\n" +
-                thirdTableData() +
+//                thirdTableData() +
                 "            </table>\n" +
                 "            <hr>\n" +
                 "        </div>\n" +
@@ -82,11 +79,11 @@ public class StatusPage implements Page {
                 "    </div>\n" +
                 "</body>\n" +
                 "</html>";
-    }
+    }/*
 
     private String firstTableData() {
         String data = "";
-        for (FirstTableRecord record : status.getFirstTableData()) {
+        for (UniqueRequestInfo record : status.getFirstTableData()) {
             data += "<tr><th>" + record.getIp() 
                     + "</th><th>" + record.getCount() 
                     + "</th><th>" + record.getLastConn() 
@@ -121,5 +118,5 @@ public class StatusPage implements Page {
 
         return data;
     }
-
+*/
 }

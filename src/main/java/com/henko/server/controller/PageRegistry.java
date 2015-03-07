@@ -1,4 +1,4 @@
-package com.henko.server.view;
+package com.henko.server.controller;
 
 public interface PageRegistry {
     
