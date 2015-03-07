@@ -1,6 +1,6 @@
 package com.henko.server.db;
 
-import com.henko.server.dao.connectionpool.HikariConnPool;
+import com.henko.server.db.connectionpool.HikariConnPool;
 
 import java.sql.Connection;
 import java.sql.SQLException;

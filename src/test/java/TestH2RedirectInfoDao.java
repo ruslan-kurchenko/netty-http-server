@@ -1,5 +1,5 @@
 import com.henko.server.dao.RedirectInfoDao;
-import com.henko.server.dao.connectionpool.HikariConnPool;
+import com.henko.server.db.connectionpool.HikariConnPool;
 import com.henko.server.dao.impl.DaoFactory;
 import com.henko.server.db.DBManager;
 import com.henko.server.model.RedirectInfo;
@@ -80,42 +80,19 @@ public class TestH2RedirectInfoDao {
     }
 
     @Test
-    public void testBasePerformance() throws InterruptedException {
-        /*Thread thread1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < 1000000; i++) {
-                    redirectInfoDao.selectByUrl("google.com");
-                }
-            }
-        });
-        thread1.start();
-        thread1.join();
+    public void testIncreaseCountByUrl() {
+        RedirectInfo expected = new RedirectInfo(1, "google.com", 11);
+        redirectInfoDao.increaseCountByUrl("google.com");
+        RedirectInfo actual = redirectInfoDao.selectByUrl("google.com");
 
-        System.out.println(1);
-        Thread thread2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < 1000000; i++) {
-                    redirectInfoDao.selectAll();
-                }
-            }
-        });
-        thread2.start();
-        thread2.join();
+        assertEquals(expected, actual);
+    }
 
-        System.out.println(2);*/
-        Thread thread3 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < 2; i++) {
-                    redirectInfoDao.updateCountByUrl("google.com", 100);
-                }
-            }
-        });
-        thread3.start();
-        thread3.join();
+    @Test
+    public void testPersist(){
+        int expectedId = 4;
+        int actualId = redirectInfoDao.persist("w3school.com");
 
-        System.out.println(3);
+        assertEquals(expectedId, actualId);
     }
 }

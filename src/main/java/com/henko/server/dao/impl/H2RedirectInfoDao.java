@@ -1,8 +1,7 @@
 package com.henko.server.dao.impl;
 
 import com.henko.server.dao.RedirectInfoDao;
-import com.henko.server.dao.connectionpool.HikariConnPool;
-import com.henko.server.model.ConnectionInfo;
+import com.henko.server.db.connectionpool.HikariConnPool;
 import com.henko.server.model.RedirectInfo;
 
 import java.sql.*;
@@ -96,8 +95,27 @@ public class H2RedirectInfoDao implements RedirectInfoDao{
     }
 
     @Override
-    public int insertRedirectInfo() {
-        return 0;
+    public int persist(String url) {
+        String insertStr = "INSERT INTO REDIRECTS (URL, R_COUNT) VALUES(?, 1);";
+
+        Connection conn = pool.getConnection();
+        PreparedStatement stmt = null;
+        int persistId = 0;
+        try {
+            stmt = conn.prepareStatement(insertStr);
+            stmt.setString(1, url);
+            stmt.executeUpdate();
+
+            RedirectInfo redirectInfo = selectByUrl(url);
+            persistId = redirectInfo.getId();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(stmt);
+            close(conn);
+        }
+
+        return persistId;
     }
 
     @Override
@@ -109,7 +127,7 @@ public class H2RedirectInfoDao implements RedirectInfoDao{
         Connection conn = pool.getConnection();
         PreparedStatement stmt = null;
         try {
-            stmt = pool.getConnection().prepareStatement(updateStr);
+            stmt = conn.prepareStatement(updateStr);
             stmt.setInt(1, count);
             stmt.setString(2, url);
             stmt.executeUpdate();
@@ -137,7 +155,7 @@ public class H2RedirectInfoDao implements RedirectInfoDao{
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            stmt = pool.getConnection().prepareStatement(queryStr);
+            stmt = conn.prepareStatement(queryStr);
             stmt.setString(1, url);
             rs = stmt.executeQuery();
             while (rs.next()){
@@ -147,6 +165,34 @@ public class H2RedirectInfoDao implements RedirectInfoDao{
             e.printStackTrace();
         } finally {
             close(rs);
+            close(stmt);
+            close(conn);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean increaseCountByUrl(String url) {
+        RedirectInfo redirectInfo = selectByUrl(url);
+        if (redirectInfo == null) return false;
+
+        String updateStr = "UPDATE REDIRECTS SET R_COUNT = ? WHERE URL = ?;";
+        int futureCount = redirectInfo.getCount() + 1;
+
+        Connection conn = pool.getConnection();
+        PreparedStatement stmt = null;
+        try {
+            stmt = conn.prepareStatement(updateStr);
+            stmt.setInt(1, futureCount);
+            stmt.setString(2, url);
+            stmt.executeUpdate();
+
+            RedirectInfo result = selectByUrl(url);
+            if (!countWasChanged(futureCount, result)) return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
             close(stmt);
             close(conn);
         }

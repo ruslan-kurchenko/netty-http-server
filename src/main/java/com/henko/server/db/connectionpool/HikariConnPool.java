@@ -1,4 +1,4 @@
-package com.henko.server.dao.connectionpool;
+package com.henko.server.db.connectionpool;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

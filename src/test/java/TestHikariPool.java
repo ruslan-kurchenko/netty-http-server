@@ -1,4 +1,4 @@
-import com.henko.server.dao.connectionpool.HikariConnPool;
+import com.henko.server.db.connectionpool.HikariConnPool;
 import org.junit.Test;
 
 import java.sql.*;

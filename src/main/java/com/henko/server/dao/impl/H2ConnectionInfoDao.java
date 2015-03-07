@@ -1,11 +1,10 @@
 package com.henko.server.dao.impl;
 
 import com.henko.server.dao.ConnectionInfoDao;
-import com.henko.server.dao.connectionpool.HikariConnPool;
+import com.henko.server.db.connectionpool.HikariConnPool;
 import com.henko.server.domain.UniqueRequestInfo;
 import com.henko.server.model.ConnectionInfo;
 
-import java.sql.Connection;
 import java.util.List;
 
 public class H2ConnectionInfoDao implements ConnectionInfoDao{
