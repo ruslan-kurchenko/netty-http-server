@@ -29,14 +29,16 @@ public class DBManager {
         String dropConnectionsStr = "DROP TABLE IF EXISTS CONNECTIONS;";
 
         Connection conn = _pool.getConnection();
+        Statement stmt = null;
         try {
-            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
             stmt.executeUpdate(dropConnectionsStr);
             stmt.executeUpdate(dropRedirectsStr);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             close(conn);
+            close(stmt);
         }
     }
 
@@ -50,10 +52,11 @@ public class DBManager {
                 "   LIMIT ?);";
 
         Connection conn = _pool.getConnection();
-
+        Statement stmt = null;
+        ResultSet rs = null;
         try {
-
-            ResultSet rs = conn.createStatement().executeQuery(selectMaxStr);
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(selectMaxStr);
             int numOfRows = _parseNumOfRows(rs);
 
             if (_tableBalanced(numOfRows, leftRows)) return;
@@ -64,6 +67,8 @@ public class DBManager {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            close(rs);
+            close(stmt);
             close(conn);
         }
     }
@@ -72,6 +77,8 @@ public class DBManager {
         PreparedStatement ps = conn.prepareStatement(deleteStr);
         ps.setInt(1, numRowsToDelete);
         ps.executeUpdate();
+
+        close(ps);
     }
 
     private boolean _tableBalanced(int numOfRows, int leftRows) {

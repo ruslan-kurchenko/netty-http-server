@@ -43,14 +43,14 @@ public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
 
         if (is100ContinueExpected(req)) _write100ContinueResponse(ctx);
 
-        String clientPath = _parseClientPath(req);
+        String path = _parseClientPath(req);
 
-        if (_isRedirect(clientPath)) {
+        if (_isRedirect(path)) {
             _processRedirect(ctx, req);
             return;
         }
 
-        ByteBuf pageContent = _controller.getPageContent(clientPath);
+        ByteBuf pageContent = _controller.getPageContent(path);
         FullHttpResponse resp = _generateFullHttpResponse(pageContent);
 
         _writeFullHttpResponse(ctx, req, resp);
