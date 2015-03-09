@@ -66,30 +66,12 @@ public class StatusPage implements Page {
                 "</html>";
     }
 
-    private String _getLastConnTable() {
-        return  "<table>\n" +
-                "  <caption>Table of last connection</caption>\n" +
-                "     <tr>\n" +
-                "        <th>IP</th>\n" +
-                "        <th>URI</th>\n" +
-                "        <th>Time stamp</th>\n" +
-                "        <th>Send Bytes</th>\n" +
-                "        <th>Received Bytes</th>\n" +
-                "        <th>Speed (byte/sec)</th>\n" +
-                "     </tr>\n" +
-                _getContentOfConnectionsTable() +
-                "</table>\n";
-    }
-
-    private String _getRedirectTable() {
-        return  "<table>\n" +
-                "  <caption>Table of redirects</caption>\n" +
-                "     <tr>\n" +
-                "        <th>URL</th>\n" +
-                "        <th>number of redirection</th>\n" +
-                "     </tr>\n" +
-                _getContentOfRedirectsTable() +
-                "</table>\n";
+    private String _getTopInfo() {
+        return  "<ul>\n" +
+                "   <li>Total requests: " + _status.getNumOfAllRequests() + "</li>\n" +
+                "   <li>Unique requests: " + _status.getNumOfUniqueRequests() + "</li>\n" +
+                "   <li>Current connections: " + _status.getNumOfCurrentConn() + "</li>\n" +
+                "</ul>\n";
     }
 
     private String _getUniqueConnTable() {
@@ -105,25 +87,43 @@ public class StatusPage implements Page {
                 "</table>\n";
     }
 
-    private String _getTopInfo() {
-        return  "<ul>\n" +
-                "   <li>The total number of requests: " + _status.getNumOfAllRequests() + "</li>\n" +
-                "   <li>The number of unique queries: " + _status.getNumOfUniqueRequests() + "</li>\n" +
-                "   <li>The number of connections at the moment: " + _status.getNumOfCurrentConn() + "</li>\n" +
-                "</ul>\n";
+    private String _getRedirectTable() {
+        return  "<table>\n" +
+                "  <caption>Table of redirects</caption>\n" +
+                "     <tr>\n" +
+                "        <th>URL</th>\n" +
+                "        <th>number of redirection</th>\n" +
+                "     </tr>\n" +
+                _getContentOfRedirectsTable() +
+                "</table>\n";
+    }
+
+    private String _getLastConnTable() {
+        return  "<table>\n" +
+                "  <caption>Table of last connection</caption>\n" +
+                "     <tr>\n" +
+                "        <th>IP</th>\n" +
+                "        <th>URI</th>\n" +
+                "        <th>Time stamp</th>\n" +
+                "        <th>Send Bytes</th>\n" +
+                "        <th>Received Bytes</th>\n" +
+                "        <th>Speed (byte/sec)</th>\n" +
+                "     </tr>\n" +
+                _getContentOfConnectionsTable() +
+                "</table>\n";
     }
 
     private String _getContentOfUniqueRequestsTable() {
         String data = "";
         List<UniqueRequest> list = _status.getUniqueRequestList();
 
-        if (list == null) return "<tr><th></th><th></th><th></th></tr>";
+        if (list == null) return _getEmptyTableColumns(3);
 
         for (UniqueRequest request : list) {
             data += "<tr>\n" +
                     "   <td>" + request.getIp() + "</td>\n" +
                     "   <td>" + request.getCount() + "</td>\n" +
-                    "   <td>" + _getTime(request.getLastConn()) + "</td>\n" +
+                    "   <td>" + _formatTime(request.getLastConn()) + "</td>\n" +
                     "</tr>\n";
         }
 
@@ -134,7 +134,7 @@ public class StatusPage implements Page {
         String data = "";
         List<Redirect> list = _status.getRedirectList();
 
-        if (list == null) return "<tr><th></th><th></th></tr>";
+        if (list == null) return _getEmptyTableColumns(2);
 
         for (Redirect redirect : list) {
             data += "<tr>\n" +
@@ -151,13 +151,13 @@ public class StatusPage implements Page {
         String data = "";
         List<Connect> list = _status.getConnectList();
 
-        if (list == null) return "<tr><th></th><th></th><th></th><th></th><th></th><th></th></tr>";
+        if (list == null) return _getEmptyTableColumns(6);
 
         for (Connect connect : list) {
             data += "<tr>\n" +
                     "   <td>" + connect.getIp() + "</td>\n" +
                     "   <td>" + connect.getUri() + "</td>\n" +
-                    "   <td>" + _getTime(connect.getTimestamp()) + "</td>\n" +
+                    "   <td>" + _formatTime(connect.getTimestamp()) + "</td>\n" +
                     "   <td>" + connect.getSendBytes() + "</td>\n" +
                     "   <td>" + connect.getReceivedBytes() + "</td>\n" +
                     "   <td>" + connect.getSpeed() + "</td>\n" +
@@ -184,7 +184,20 @@ public class StatusPage implements Page {
                 "    </style>\n";
     }
 
-    private String _getTime(long time) {
+    private String _getEmptyTableColumns(int count){
+        StringBuilder str = new StringBuilder();
+
+        str.append("<tr>");
+        for (int i = 0; i < count; i++) {
+            str.append("<th></th>");
+        }
+        str.append("</tr>");
+
+        return str.toString();
+    }
+
+
+    private String _formatTime(long time) {
         return _dateFormat.format(new Date(time));
     }
 }

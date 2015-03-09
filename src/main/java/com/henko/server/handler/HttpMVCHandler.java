@@ -30,8 +30,6 @@ public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
     private final Connect _connInfo;
     private final Controller _controller = new Controller();
 
-    private static final Charset CONTENT_CHARSET = Charset.forName("UTF-8");
-
     public HttpMVCHandler(Connect connInfo) {
         this._connInfo = connInfo;
     }
@@ -52,7 +50,7 @@ public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
             return;
         }
 
-        ByteBuf pageContent = _controller.getPageContent(clientPath, CONTENT_CHARSET);
+        ByteBuf pageContent = _controller.getPageContent(clientPath);
         FullHttpResponse resp = _generateFullHttpResponse(pageContent);
 
         _writeFullHttpResponse(ctx, req, resp);

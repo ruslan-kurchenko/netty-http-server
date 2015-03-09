@@ -30,16 +30,18 @@ public class Controller {
     private final static int UNIQUE_REQ_AMOUNT = 3;
     private final static int REDIRECT_AMOUNT = 3;
 
+    private static final Charset CONTENT_CHARSET = Charset.forName("UTF-8");
+
     public Controller() {
         _daoFactory = getDaoFactory(H2);
     }
     
-    public ByteBuf getPageContent(String path, Charset charset) throws InterruptedException {
+    public ByteBuf getPageContent(String path) throws InterruptedException {
         switch (path) {
-            case PAGE_HELLO: return _processPageHello(charset);
-            case PAGE_STATUS: return _processPageStatus(charset);
+            case PAGE_HELLO: return _processPageHello();
+            case PAGE_STATUS: return _processPageStatus();
             
-            default: return _processPageError(path, charset);
+            default: return _processPageError(path);
         }
     }
 
@@ -53,34 +55,34 @@ public class Controller {
         return "http://" + parameters.get("url").get(0);
     }
 
-    private ByteBuf _processPageHello(Charset charset) throws InterruptedException {
+    private ByteBuf _processPageHello() throws InterruptedException {
         //Thread.sleep(10000);
 
-        return new HelloPage().getContent(charset);
+        return new HelloPage().getContent(CONTENT_CHARSET);
     }
 
-    private ByteBuf _processPageStatus(Charset charset) {
+    private ByteBuf _processPageStatus() {
         ServerStatus serverStatus = _prepareServerStatus();
 
-        return new StatusPage(serverStatus).getContent(charset);
+        return new StatusPage(serverStatus).getContent(CONTENT_CHARSET);
+    }
+
+    private ByteBuf _processPageError(String path) {
+        return new ErrorPage(path).getContent(CONTENT_CHARSET);
     }
 
     private ServerStatus _prepareServerStatus() {
         ConnectDao connDao = _daoFactory.getConnectionDao();
+        RedirectDao redirectDao = _daoFactory.getRedirectDao();
+
         List<Connect> connList = connDao.getLastNConn(CONNECT_AMOUNT);
         List<UniqueRequest> uniqueRequestList = connDao.getNUniqueRequest(UNIQUE_REQ_AMOUNT);
         int requests = connDao.getNumOfAllConn();
         int uniqueRequest = connDao.getNumOfUniqueConn();
         int currentConn = connDao.getNumOfCurrentConn();
-
-        RedirectDao redirectDao = _daoFactory.getRedirectDao();
         List<Redirect> redirectList = redirectDao.getNRedirect(REDIRECT_AMOUNT);
 
         return new ServerStatus(requests, uniqueRequest, currentConn, uniqueRequestList, connList, redirectList);
-    }
-
-    private ByteBuf _processPageError(String path, Charset charset) {
-        return new ErrorPage(path).getContent(charset);
     }
 
     private boolean _validateParameters(Map<String, List<String>> parameters) {
