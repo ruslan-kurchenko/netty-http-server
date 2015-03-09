@@ -58,7 +58,7 @@ public class TestH2ConnectionInfoDao {
 
     @Test
     public void testSelectById() {
-        ConnectionInfo expected = new ConnectionInfo(1, "111.11.11.11", "/hello", new Date(firstRowTime), 100, 100, 200);
+        ConnectionInfo expected = new ConnectionInfo(1, "111.11.11.11", "/hello", firstRowTime, 100, 100, 200);
         ConnectionInfo actual = dao.selectById(1);
 
         assertEquals(expected, actual);
@@ -67,9 +67,9 @@ public class TestH2ConnectionInfoDao {
     @Test
     public void testSelectAll() {
         List<ConnectionInfo> expected = new ArrayList<ConnectionInfo>(){{
-            add(new ConnectionInfo(1, "111.11.11.11", "/hello", new Date(firstRowTime), 100, 100, 200));
-            add(new ConnectionInfo(2, "222.22.22.22", "/hello", new Date(secondRowTime), 100, 100, 200));
-            add(new ConnectionInfo(3, "222.22.22.22", "/status", new Date(thirdRowTime), 100, 100, 200));
+            add(new ConnectionInfo(1, "111.11.11.11", "/hello", firstRowTime, 100, 100, 200));
+            add(new ConnectionInfo(2, "222.22.22.22", "/hello", secondRowTime, 100, 100, 200));
+            add(new ConnectionInfo(3, "222.22.22.22", "/status", thirdRowTime, 100, 100, 200));
         }};
 
         List<ConnectionInfo> actual = dao.selectAll();
@@ -92,23 +92,33 @@ public class TestH2ConnectionInfoDao {
     @Test
     public void testInsertConnectionInfo() {
         long timeStamp = 555555555;
-        ConnectionInfo expected = new ConnectionInfo(4, "555.55.55.55", "/status", new Date(timeStamp), 500, 500, 200);
+        ConnectionInfo expected = new ConnectionInfo(4, "555.55.55.55", "/status", timeStamp, 500, 500, 200);
 
-        assertNull(dao.selectById(5));
+        assertNull(dao.selectById(4));
 
-        int id = dao.insertConnectionInfo(expected);
-        ConnectionInfo actual = dao.selectById(id);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void testSelectByTimeStamp() {
-        ConnectionInfo expected = new ConnectionInfo(1, "111.11.11.11", "/hello", new Date(firstRowTime), 100, 100, 200);
-        ConnectionInfo actual = dao.selectByTimeStamp(firstRowTime);
+        dao.insertConnectionInfo(expected);
+        ConnectionInfo actual = dao.selectById(4);
 
         assertEquals(expected, actual);
     }
+
+//    @Test
+//    public void testSelectByTimeStamp() {
+//        long timestamp =  0;
+//        ConnectionInfo expected = null;
+//        for (int i = 0; i < 100; i++) {
+//            timestamp = System.currentTimeMillis();
+//            expected = new ConnectionInfo("111.11.11.11", "/hello", timestamp, 100, 100, 200);
+//
+//            dao.insertConnectionInfo(expected);
+//
+//            System.out.println(dao.selectByTimeStamp(timestamp));
+//        }
+//        expected.setId(103);
+//        ConnectionInfo actual = dao.selectByTimeStamp(timestamp);
+//
+//        assertEquals(expected, actual);
+//    }
 
     @Test
     public void testSelectNumberOfUniqueRequest() {

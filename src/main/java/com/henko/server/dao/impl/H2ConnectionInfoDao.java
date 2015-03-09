@@ -123,7 +123,7 @@ public class H2ConnectionInfoDao implements ConnectionInfoDao{
     }
 
     @Override
-    public int insertConnectionInfo(ConnectionInfo connInfo) {
+    public void insertConnectionInfo(ConnectionInfo connInfo) {
         String insertStr = "INSERT INTO " +
                 "CONNECTIONS(SRC_IP, URI, TIME_STAMP, SEND_B, RECEIVED_B, SPEED) " +
                 "VALUES (?, ?, ?, ?, ?, ?);";
@@ -134,22 +134,18 @@ public class H2ConnectionInfoDao implements ConnectionInfoDao{
             stmt = conn.prepareStatement(insertStr);
             stmt.setString(1, connInfo.getIp());
             stmt.setString(2, connInfo.getUri());
-            stmt.setLong(3, connInfo.getTimestamp().getTime());
+            stmt.setLong(3, connInfo.getTimestamp());
             stmt.setLong(4, connInfo.getSendBytes());
             stmt.setLong(5, connInfo.getReceivedBytes());
             stmt.setLong(6, connInfo.getSpeed());
             stmt.executeUpdate();
 
-            ConnectionInfo connectionInfo = selectByTimeStamp(connInfo.getTimestamp().getTime());
-            return connectionInfo.getId();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             close(stmt);
             close(conn);
         }
-
-        return 0;
     }
 
     @Override
@@ -224,7 +220,7 @@ public class H2ConnectionInfoDao implements ConnectionInfoDao{
     private ConnectionInfo parseConnectionInfo(int id, ResultSet rs) throws SQLException {
         String ip = rs.getString(2);
         String uri = rs.getString(3);
-        Date timestamp = new Date(rs.getLong(4));
+        long timestamp = rs.getLong(4);
         long sendBytes = rs.getLong(5);
         long receivedBytes = rs.getLong(6);
         long speed = rs.getLong(7);
@@ -236,12 +232,11 @@ public class H2ConnectionInfoDao implements ConnectionInfoDao{
         int id = rs.getInt(1);
         String ip = rs.getString(2);
         String uri = rs.getString(3);
-        Date timestamp = new Date(timeStamp);
         long sendBytes = rs.getLong(5);
         long receivedBytes = rs.getLong(6);
         long speed = rs.getLong(7);
 
-        return new ConnectionInfo(id, ip, uri, timestamp, sendBytes, receivedBytes, speed);
+        return new ConnectionInfo(id, ip, uri, timeStamp, sendBytes, receivedBytes, speed);
     }
 
     private List<ConnectionInfo> parseConnectionInfoList(ResultSet rs) throws SQLException {
@@ -250,7 +245,7 @@ public class H2ConnectionInfoDao implements ConnectionInfoDao{
             int id = rs.getInt(1);
             String ip = rs.getString(2);
             String uri = rs.getString(3);
-            Date timestamp = new Date(rs.getLong(4));
+            long timestamp = rs.getLong(4);
             long sendBytes = rs.getLong(5);
             long receivedBytes = rs.getLong(6);
             long speed = rs.getLong(7);

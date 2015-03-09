@@ -7,7 +7,7 @@ public class ConnectionInfo implements Serializable {
     private int id;
     private String ip;
     private String uri;
-    private Date timestamp;
+    private long timestamp;
     private long sendBytes;
     private long receivedBytes;
     private long speed;
@@ -17,7 +17,7 @@ public class ConnectionInfo implements Serializable {
     }
 
     public ConnectionInfo(int id, String ip, String uri, 
-                          Date timestamp, long sendBytes,
+                          long timestamp, long sendBytes,
                           long receivedBytes, long speed) {
         this.id = id;
         this.ip = ip;
@@ -29,7 +29,7 @@ public class ConnectionInfo implements Serializable {
     }
 
     public ConnectionInfo(String ip, String uri,
-                          Date timestamp, long sendBytes,
+                          long timestamp, long sendBytes,
                           long receivedBytes, long speed) {
         this.ip = ip;
         this.uri = uri;
@@ -63,11 +63,11 @@ public class ConnectionInfo implements Serializable {
         this.uri = uri;
     }
 
-    public Date getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -106,8 +106,8 @@ public class ConnectionInfo implements Serializable {
         if (receivedBytes != that.receivedBytes) return false;
         if (sendBytes != that.sendBytes) return false;
         if (speed != that.speed) return false;
+        if (timestamp != that.timestamp) return false;
         if (ip != null ? !ip.equals(that.ip) : that.ip != null) return false;
-        if (timestamp != null ? !timestamp.equals(that.timestamp) : that.timestamp != null) return false;
         if (uri != null ? !uri.equals(that.uri) : that.uri != null) return false;
 
         return true;
@@ -118,7 +118,7 @@ public class ConnectionInfo implements Serializable {
         int result = id;
         result = 31 * result + (ip != null ? ip.hashCode() : 0);
         result = 31 * result + (uri != null ? uri.hashCode() : 0);
-        result = 31 * result + (timestamp != null ? timestamp.hashCode() : 0);
+        result = 31 * result + (int) (timestamp ^ (timestamp >>> 32));
         result = 31 * result + (int) (sendBytes ^ (sendBytes >>> 32));
         result = 31 * result + (int) (receivedBytes ^ (receivedBytes >>> 32));
         result = 31 * result + (int) (speed ^ (speed >>> 32));

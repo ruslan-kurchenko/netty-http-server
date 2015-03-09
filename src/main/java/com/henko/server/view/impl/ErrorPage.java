@@ -27,7 +27,7 @@ public class ErrorPage implements Page {
                 "</head>\n" +
                 "<body>\n" +
                 "    <h1>Not Found</h1>\n" +
-                "    <p>The requested URL ~" + errorPath + "was not found on this server.</p>\n" +
+                "    <p>The requested URL ~" + errorPath + " was not found on this server.</p>\n" +
                 "    <hr>\n" +
                 "    <address>Netty Server by Ruslan Kurchenko</address>\n" +
                 "</body>\n" +

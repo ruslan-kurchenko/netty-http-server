@@ -15,7 +15,7 @@ public interface ConnectionInfoDao {
 
     public List<UniqueRequestInfo> selectUniqueRequestInfo();
 
-    public int insertConnectionInfo(ConnectionInfo connectionInfo);
+    public void insertConnectionInfo(ConnectionInfo connectionInfo);
 
     public boolean deleteConnectionInfo();
 

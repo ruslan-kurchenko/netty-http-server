@@ -1,5 +1,6 @@
 package com.henko.server;
 
+import com.henko.server.db.DBManager;
 import com.henko.server.handler.HttpServerInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -23,6 +24,9 @@ public class HttpServer {
     public static void main(String[] args) throws Exception {
         // Configure SSL
         final SslContext sslCtx = configureSslContext();
+
+        DBManager dbManager = new DBManager();
+        dbManager.initialiseDB();
 
         // Configure the server
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -57,6 +61,7 @@ public class HttpServer {
         } else {
             sslCtx = null;
         }
+
         return sslCtx;
     }
 }

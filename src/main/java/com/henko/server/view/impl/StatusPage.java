@@ -1,11 +1,16 @@
 package com.henko.server.view.impl;
 
 import com.henko.server.domain.ServerStatus;
+import com.henko.server.domain.UniqueRequestInfo;
+import com.henko.server.model.ConnectionInfo;
+import com.henko.server.model.RedirectInfo;
 import com.henko.server.view.Page;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.nio.charset.Charset;
+import java.util.Date;
+import java.util.List;
 
 public class StatusPage implements Page {
 
@@ -28,37 +33,37 @@ public class StatusPage implements Page {
                 "    <title>Server Status</title>\n" +
                 "</head>\n" +
                 "<body>\n" +
-                
+
                 "    <div class=\"container\">\n" +
                 "        <h2 style=\"text-align: center; \">SERVER STATUS</h2>\n" +
                 "        <div class=\"top-info\">\n" +
-//                "            The total number of requests            - " + status.getAllRequests() + " <br>\n" +
-//                "            The number of unique queries            - " + status.getUniqueRequests() + "<br>\n" +
-//                "            The number of connections at the moment - " + status.getCurrentConnections() + "<br>\n" +
+                "            The total number of requests            - " + status.getNumberOfAllRequests() + " <br>\n" +
+                "            The number of unique queries            - " + status.getNumberOfUniqueRequests() + "<br>\n" +
+                "            The number of connections at the moment - " + status.getNumberOfCurrentConnections() + "<br>\n" +
                 "            <hr>\n" +
                 "        </div>\n" +
-                
+
                 "        <!--first table: IP, number of connections, last connection-->\n" +
                 "        <div class=\"table first\">\n" +
                 "            <table border=\"1\">\n" +
                 "                <caption>Table of count for certain IP connection</caption>\n" +
                 "                <tr><th>IP</th><th>number of connection</th><th>last connection</th></tr>\n" +
-//                firstTableData() +
+                generateTableOfUniqueRequests() +
                 "            </table>\n" +
                 "            <hr>\n" +
                 "        </div>\n" +
-                
+
                 "        <!--second table: URL, number of redirect-->\n" +
                 "        <div class=\"table second\">\n" +
                 "            <table border=\"1\">\n" +
                 "                <caption>Table of count for certain redirection</caption>\n" +
                 "                <tr><th>URL</th><th>number of redirection</th></tr>\n" +
-//                secondTableData() +
+                generateTableOfRedirects() +
                 "            </table>\n" +
                 "            \n" +
                 "            <hr>\n" +
                 "        </div>\n" +
-                
+
                 "        <!--third table: IP, URI, timestamp, send bytes, received bytes, speed(byte/sec)-->\n" +
                 "        <div class=\"table third\">\n" +
                 "            <table border=\"1\">\n" +
@@ -71,52 +76,69 @@ public class StatusPage implements Page {
                 "                    <th>Received Bytes</th>\n" +
                 "                    <th>Speed (byte/sec)</th>\n" +
                 "                </tr>\n" +
-//                thirdTableData() +
+                generateTableOfConnection() +
                 "            </table>\n" +
                 "            <hr>\n" +
                 "        </div>\n" +
-                
+
                 "    </div>\n" +
                 "</body>\n" +
                 "</html>";
-    }/*
-
-    private String firstTableData() {
-        String data = "";
-        for (UniqueRequestInfo record : status.getFirstTableData()) {
-            data += "<tr><th>" + record.getIp() 
-                    + "</th><th>" + record.getCount() 
-                    + "</th><th>" + record.getLastConn() 
-                    + "</th></tr>\n";
-        }
-        
-        return data;
     }
-    
-    private String secondTableData() {
+
+    private String generateTableOfUniqueRequests() {
         String data = "";
-        for (SecondTableRecord record : status.getSecondTableData()) {
-            data += "<tr><th>" + record.getUrl()
-                    + "</th><th>" + record.getNumberOfRedirect()
-                    + "</th></tr>\n";
+        List<UniqueRequestInfo> list = status.getUniqueRequestInfoList();
+
+        if (list == null) {
+            data += "<tr><th>\t\r</th><th>\t\r</th><th>\t\r</th></tr>";
+
+        } else {
+            for (UniqueRequestInfo info : list) {
+                data += "<tr><th>" + info.getIp()
+                        + "</th><th>" + info.getCount()
+                        + "</th><th>" + info.getLastConn()
+                        + "</th></tr>\n";
+            }
         }
 
         return data;
     }
 
-    private String thirdTableData() {
+    private String generateTableOfRedirects() {
         String data = "";
-        for (ThirdTableRecord record : status.getThirdTableData()) {
-            data += "<tr><th>" + record.getIp()
-                    + "</th><th>" + record.getUri()
-                    + "</th><th>" + record.getTimestamp()
-                    + "</th><th>" + record.getSendBytes()
-                    + "</th><th>" + record.getReceivedBytes()
-                    + "</th><th>" + record.getSpeed()
-                    + "</th></tr>\n";
+        List<RedirectInfo> list = status.getRedirectInfoList();
+
+        if (list == null) {
+            data += "<tr><th></th><th></th></tr>";
+        } else {
+            for (RedirectInfo info : list) {
+                data += "<tr><th>" + info.getUrl()
+                        + "</th><th>" + info.getCount()
+                        + "</th></tr>\n";
+            }
         }
 
         return data;
     }
-*/
+
+    private String generateTableOfConnection() {
+        String data = "";
+        List<ConnectionInfo> list = status.getConnectionInfoList();
+
+        if (list == null) {
+            data += "<tr><th></th><th></th><th></th><th></th><th></th><th></th></tr>";
+        } else {
+            for (ConnectionInfo info : list) {
+                data += "<tr><th>" + info.getIp()
+                        + "</th><th>" + info.getUri()
+                        + "</th><th>" + new Date(info.getTimestamp())
+                        + "</th><th>" + info.getSendBytes()
+                        + "</th><th>" + info.getReceivedBytes()
+                        + "</th><th>" + info.getSpeed()
+                        + "</th></tr>\n";
+            }
+        }
+        return data;
+    }
 }
