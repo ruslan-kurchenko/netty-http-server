@@ -23,7 +23,8 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel>{
         ChannelPipeline p = ch.pipeline();
         if (sslCtx != null) p.addLast(sslCtx.newHandler(ch.alloc()));
 
-        p.addFirst(new HttpTrafficCounter(0, connectionInfo));
+        p.addLast(new HttpTrafficCounter(0, connectionInfo));
+        p.addLast(new HttpConnectionCountHandler(0));
         p.addLast(new HttpServerCodec());
         p.addLast(new HttpMVCHandler(connectionInfo));
     }

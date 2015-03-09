@@ -3,6 +3,7 @@ package com.henko.server.dao.impl;
 import com.henko.server.dao.ConnectionInfoDao;
 import com.henko.server.db.connectionpool.HikariConnPool;
 import com.henko.server.domain.UniqueRequestInfo;
+import com.henko.server.handler.HttpConnectionCountHandler;
 import com.henko.server.model.ConnectionInfo;
 import com.henko.server.model.RedirectInfo;
 
@@ -180,7 +181,7 @@ public class H2ConnectionInfoDao implements ConnectionInfoDao{
 
     @Override
     public int selectNumberOfCurrentConn() {
-        return 0;
+        return HttpConnectionCountHandler.getConnectionCount();
     }
 
     @Override

@@ -19,7 +19,6 @@ public class HttpTrafficCounter extends ChannelTrafficShapingHandler {
     private double durationMillis;
     private long receivedBytes;
     private long sendBytes;
-    private long speed;
 
     private HttpTrafficCounter(long checkInterval) {
         super(checkInterval);
@@ -53,7 +52,7 @@ public class HttpTrafficCounter extends ChannelTrafficShapingHandler {
 
         receivedBytes = this.trafficCounter().cumulativeReadBytes();
         sendBytes = this.trafficCounter().cumulativeWrittenBytes();
-        speed = parseSpeed();
+        long speed = parseSpeed();
 
         connInfo.setReceivedBytes(receivedBytes);
         connInfo.setSendBytes(sendBytes);
@@ -61,10 +60,10 @@ public class HttpTrafficCounter extends ChannelTrafficShapingHandler {
 
         connInfoDao.insertConnectionInfo(connInfo);
 
-        System.err.println("\nstart - " + connInfo.getTimestamp() + ", end - " + stopConnTimeStamp + ", duration - " + durationMillis);
-        System.err.println("handler removed: duration: - " + durationMillis + ", received_b - " + receivedBytes +
-                ", send_b - " + sendBytes +
-                ", speed - " + speed + "\n");
+//        System.err.println("\nstart - " + connInfo.getTimestamp() + ", end - " + stopConnTimeStamp + ", duration - " + durationMillis);
+//        System.err.println("handler removed: duration: - " + durationMillis + ", received_b - " + receivedBytes +
+//                ", send_b - " + sendBytes +
+//                ", speed - " + speed + "\n");
     }
 
     private long parseDurationMillis(long stopConnTimeStamp) {
@@ -83,7 +82,6 @@ public class HttpTrafficCounter extends ChannelTrafficShapingHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        System.out.println(cause.getMessage());
         super.exceptionCaught(ctx, cause);
     }
 }

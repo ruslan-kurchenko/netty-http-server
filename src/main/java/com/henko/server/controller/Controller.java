@@ -11,9 +11,14 @@ import com.henko.server.view.impl.ErrorPage;
 import com.henko.server.view.impl.HelloPage;
 import com.henko.server.view.impl.StatusPage;
 import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Map;
 
 import static com.henko.server.controller.PathRegistry.*;
 import static com.henko.server.dao.impl.DaoFactory.*;
@@ -25,7 +30,7 @@ public class Controller {
         daoFactory = getDaoFactory(H2);
     }
     
-    public ByteBuf getPageContent(String path, Charset charset) {
+    public ByteBuf getPageContent(String path, Charset charset) throws InterruptedException {
         switch (path) {
             case PAGE_HELLO: return processPageHello(charset);
             case PAGE_STATUS: return processPageStatus(charset);
@@ -58,11 +63,27 @@ public class Controller {
         return new StatusPage(serverStatus).getContent(charset);
     }
 
-    private ByteBuf processPageHello(Charset charset) {
+    private ByteBuf processPageHello(Charset charset) throws InterruptedException {
+        Thread.currentThread().sleep(10000);
+
         return new HelloPage().getContent(charset);
     }
     
     private ByteBuf processPageError(String path, Charset charset) {
         return new ErrorPage(path).getContent(charset);
+    }
+
+    public String parseRedirectUrl(HttpRequest req) throws URISyntaxException {
+        URI uri = new URI(req.getUri());
+        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(uri);
+        Map<String, List<String>> parameters = queryStringDecoder.parameters();
+
+        if (!validateParameters(parameters)) return " ";
+
+        return "http://" + parameters.get("url").get(0);
+    }
+
+    private boolean validateParameters(Map<String, List<String>> parameters) {
+        return parameters.containsKey("url");
     }
 }

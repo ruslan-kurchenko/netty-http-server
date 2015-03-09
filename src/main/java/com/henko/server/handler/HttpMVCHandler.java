@@ -34,31 +34,32 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
 
     private final ConnectionInfo connInfo;
-    private final ConnectionInfoDao connInfoDao;
+    private final Controller controller;
 
     private static final Charset CONTENT_CHARSET = Charset.forName("UTF-8");
 
     public HttpMVCHandler(ConnectionInfo connInfo) {
         this.connInfo = connInfo;
-        this.connInfoDao = getDaoFactory(H2).getConnectionInfoDao();
+        this.controller = new Controller();
     }
-    
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if ( !(msg instanceof HttpRequest) ) return;
         HttpRequest req = (HttpRequest) msg;
 
+        saveConnInfoData(ctx, req);
+
         if (is100ContinueExpected(req)) write100ContinueResponse(ctx);
 
         String clientPath = parseClientPath(req);
 
-        if (isRedirect(clientPath)) processRedirect(ctx, req); //TODO: continue realization!
+        if (isRedirect(clientPath)) {
+            processRedirect(ctx, req);
+            return;
+        }
 
-        saveConnInfoData(ctx, req);
-
-        Controller controller = new Controller();
         ByteBuf pageContent = controller.getPageContent(clientPath, CONTENT_CHARSET);
-        
         FullHttpResponse resp = generateFullHttpResponse(pageContent);
 
         writeFullHttpResponse(ctx, req, resp);
@@ -66,15 +67,48 @@ public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
 
     private void saveConnInfoData(ChannelHandlerContext ctx, HttpRequest req) throws URISyntaxException {
         InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
-        String src_ip = inetSocketAddress.getHostString();
+        String ip = inetSocketAddress.getAddress().getHostAddress();
         String uri = parseClientPath(req);
 
-        connInfo.setIp(src_ip);
+        connInfo.setIp(ip);
         connInfo.setUri(uri);
     }
 
     private void write100ContinueResponse(ChannelHandlerContext ctx) {
         ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
+    }
+
+    private String parseClientPath(HttpRequest req) throws URISyntaxException {
+        URI uri = new URI(req.getUri().toLowerCase());
+        return uri.getPath();
+    }
+
+    private boolean isRedirect(String clientPath) {
+        return REDIRECT.equals(clientPath);
+    }
+
+    private void processRedirect(ChannelHandlerContext ctx, HttpRequest req) throws URISyntaxException {
+        String url = controller.parseRedirectUrl(req);
+        FullHttpResponse resp = new DefaultFullHttpResponse(HTTP_1_1, FOUND);
+        resp.headers().set(LOCATION, url);
+        ctx.writeAndFlush(resp).addListener(ChannelFutureListener.CLOSE);
+    }
+
+    private FullHttpResponse generateFullHttpResponse(ByteBuf pageContent) {
+        FullHttpResponse resp = new DefaultFullHttpResponse(HTTP_1_1, OK, pageContent);
+        resp.headers().set(CONTENT_TYPE, "text/html");
+        resp.headers().set(CONTENT_LENGTH, resp.content().readableBytes());
+
+        return resp;
+    }
+
+    private void writeFullHttpResponse(ChannelHandlerContext ctx, HttpRequest req, FullHttpResponse resp) {
+        if (!isKeepAlive(req)) {
+            ctx.write(resp).addListener(ChannelFutureListener.CLOSE);
+        } else {
+            resp.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+            ctx.write(resp);
+        }
     }
 
     @Override
@@ -86,65 +120,5 @@ public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
         ctx.close();
-    }
-
-
-
-    private void processRedirect(ChannelHandlerContext ctx, HttpRequest req) throws URISyntaxException {
-        String url = "http://" + parseRedirectUrl(req);
-        System.out.println(url);
-
-        FullHttpResponse resp = new DefaultFullHttpResponse(HTTP_1_1, FOUND);
-        resp.headers().set(LOCATION, url);
-        ctx.writeAndFlush(resp).addListener(ChannelFutureListener.CLOSE);
-    }
-
-    private String parseRedirectUrl(HttpRequest req) throws URISyntaxException {
-        URI uri = new URI(req.getUri());
-        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(uri);
-        Map<String, List<String>> parameters = queryStringDecoder.parameters();
-
-        if (!validateParameters(parameters)) return " ";
-
-        return parameters.get("url").get(0);
-    }
-
-    private boolean validateParameters(Map<String, List<String>> parameters) {
-        if (!parameters.containsKey("url")) return false;
-        System.out.println("Contains");
-        try{
-            parameters.get("url").get(0);
-        } catch (NullPointerException ignore) {
-            System.out.println("Null");
-            return false;
-        }
-        System.out.println(parameters.get("url").get(0));
-        return true;
-    }
-
-    private boolean isRedirect(String clientPath) {
-        return REDIRECT.equals(clientPath);
-    }
-
-    private FullHttpResponse generateFullHttpResponse(ByteBuf pageContent) {
-        FullHttpResponse resp = new DefaultFullHttpResponse(HTTP_1_1, OK, pageContent);
-        resp.headers().set(CONTENT_TYPE, "text/html");
-        resp.headers().set(CONTENT_LENGTH, resp.content().readableBytes());
-
-        return resp;
-    }
-
-    private String parseClientPath(HttpRequest req) throws URISyntaxException {
-        URI uri = new URI(req.getUri().toLowerCase());
-        return uri.getPath();
-    }
-
-    private void writeFullHttpResponse(ChannelHandlerContext ctx, HttpRequest req, FullHttpResponse resp) {
-        if (!isKeepAlive(req)) {
-            ctx.write(resp).addListener(ChannelFutureListener.CLOSE);
-        } else {
-            resp.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
-            ctx.write(resp);
-        }
     }
 }
