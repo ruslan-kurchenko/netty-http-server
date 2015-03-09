@@ -1,9 +1,9 @@
 package com.henko.server.view.impl;
 
 import com.henko.server.domain.ServerStatus;
-import com.henko.server.domain.UniqueRequestInfo;
-import com.henko.server.model.ConnectionInfo;
-import com.henko.server.model.RedirectInfo;
+import com.henko.server.domain.UniqueRequest;
+import com.henko.server.model.Connect;
+import com.henko.server.model.Redirect;
 import com.henko.server.view.Page;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -37,9 +37,9 @@ public class StatusPage implements Page {
                 "    <div class=\"container\">\n" +
                 "        <h2 style=\"text-align: center; \">SERVER STATUS</h2>\n" +
                 "        <div class=\"top-info\">\n" +
-                "            The total number of requests            - " + status.getNumberOfAllRequests() + " <br>\n" +
-                "            The number of unique queries            - " + status.getNumberOfUniqueRequests() + "<br>\n" +
-                "            The number of connections at the moment - " + status.getNumberOfCurrentConnections() + "<br>\n" +
+                "            The total number of requests            - " + status.getNumOfAllRequests() + " <br>\n" +
+                "            The number of unique queries            - " + status.getNumOfUniqueRequests() + "<br>\n" +
+                "            The number of connections at the moment - " + status.getNumOfCurrentConn() + "<br>\n" +
                 "            <hr>\n" +
                 "        </div>\n" +
 
@@ -88,13 +88,13 @@ public class StatusPage implements Page {
 
     private String generateTableOfUniqueRequests() {
         String data = "";
-        List<UniqueRequestInfo> list = status.getUniqueRequestInfoList();
+        List<UniqueRequest> list = status.getUniqueRequestList();
 
         if (list == null) {
             data += "<tr><th>\t\r</th><th>\t\r</th><th>\t\r</th></tr>";
 
         } else {
-            for (UniqueRequestInfo info : list) {
+            for (UniqueRequest info : list) {
                 data += "<tr><th>" + info.getIp()
                         + "</th><th>" + info.getCount()
                         + "</th><th>" + info.getLastConn()
@@ -107,12 +107,12 @@ public class StatusPage implements Page {
 
     private String generateTableOfRedirects() {
         String data = "";
-        List<RedirectInfo> list = status.getRedirectInfoList();
+        List<Redirect> list = status.getRedirectList();
 
         if (list == null) {
             data += "<tr><th></th><th></th></tr>";
         } else {
-            for (RedirectInfo info : list) {
+            for (Redirect info : list) {
                 data += "<tr><th>" + info.getUrl()
                         + "</th><th>" + info.getCount()
                         + "</th></tr>\n";
@@ -124,12 +124,12 @@ public class StatusPage implements Page {
 
     private String generateTableOfConnection() {
         String data = "";
-        List<ConnectionInfo> list = status.getConnectionInfoList();
+        List<Connect> list = status.getConnectList();
 
         if (list == null) {
             data += "<tr><th></th><th></th><th></th><th></th><th></th><th></th></tr>";
         } else {
-            for (ConnectionInfo info : list) {
+            for (Connect info : list) {
                 data += "<tr><th>" + info.getIp()
                         + "</th><th>" + info.getUri()
                         + "</th><th>" + new Date(info.getTimestamp())

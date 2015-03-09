@@ -1,17 +1,17 @@
 package com.henko.server.dao.impl;
 
-import com.henko.server.dao.ConnectionInfoDao;
-import com.henko.server.dao.RedirectInfoDao;
+import com.henko.server.dao.ConnectDao;
+import com.henko.server.dao.RedirectDao;
 
 public class H2DaoFactory extends DaoFactory {
 
     @Override
-    public ConnectionInfoDao getConnectionInfoDao() {
-        return new H2ConnectionInfoDao();
+    public ConnectDao getConnectionDao() {
+        return new H2ConnectDao();
     }
 
     @Override
-    public RedirectInfoDao getRedirectInfoDao() {
-        return new H2RedirectInfoDao();
+    public RedirectDao getRedirectDao() {
+        return new H2RedirectDao();
     }
 }

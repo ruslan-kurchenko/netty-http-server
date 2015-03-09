@@ -1,9 +1,9 @@
 package com.henko.server.dao.impl;
 
-import com.henko.server.dao.RedirectInfoDao;
+import com.henko.server.dao.RedirectDao;
 import com.henko.server.dao.exception.PersistException;
 import com.henko.server.db.HikariConnPool;
-import com.henko.server.model.RedirectInfo;
+import com.henko.server.model.Redirect;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,16 +12,16 @@ import java.util.List;
 import static com.henko.server.db.DBUtil.close;
 
 
-public class H2RedirectInfoDao implements RedirectInfoDao {
+public class H2RedirectDao implements RedirectDao {
     private HikariConnPool _pool;
 
-    public H2RedirectInfoDao() {
+    public H2RedirectDao() {
         _pool = HikariConnPool.getConnPool();
     }
 
     @Override
-    public RedirectInfo selectByUrl(String url) {
-        RedirectInfo info = null;
+    public Redirect getByUrl(String url) {
+        Redirect info = null;
         String selectStr = "SELECT * FROM REDIRECTS WHERE URL = ?;";
 
         Connection conn = _pool.getConnection();
@@ -41,7 +41,7 @@ public class H2RedirectInfoDao implements RedirectInfoDao {
 
             if (redirectNotFound(id)) return null;
 
-            info = new RedirectInfo(id, url, count);
+            info = new Redirect(id, url, count);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -54,21 +54,7 @@ public class H2RedirectInfoDao implements RedirectInfoDao {
     }
 
     @Override
-    public void addOrIncrementCount(String url) throws PersistException {
-        if (selectByUrl(url) == null) {
-            if (_insertRedirectInfo(url) == 0) throw new PersistException();
-            return;
-        }
-
-        if (!_increaseCountByUrl(url)) throw new PersistException();
-    }
-
-    private boolean redirectNotFound(int id) {
-        return id == 0;
-    }
-
-    @Override
-    public List<RedirectInfo> selectAll() {
+    public List<Redirect> getAll() {
         String selectStr = "SELECT * FROM REDIRECTS;";
 
         Connection conn = _pool.getConnection();
@@ -92,9 +78,8 @@ public class H2RedirectInfoDao implements RedirectInfoDao {
         return null;
     }
 
-
     @Override
-    public List<RedirectInfo> selectListByMaxCount(int howMany) {
+    public List<Redirect> getNRedirect(int amount) {
         String selectStr = "" +
                 "SELECT * " +
                 "FROM (" +
@@ -108,7 +93,7 @@ public class H2RedirectInfoDao implements RedirectInfoDao {
         ResultSet rs = null;
         try {
             stmt = conn.prepareStatement(selectStr);
-            stmt.setInt(1, howMany);
+            stmt.setInt(1, amount);
             rs = stmt.executeQuery();
 
             if (_isEmpty(rs)) return null;
@@ -125,30 +110,14 @@ public class H2RedirectInfoDao implements RedirectInfoDao {
         return null;
     }
 
-    private boolean _increaseCountByUrl(String url) {
-        RedirectInfo redirectInfo = selectByUrl(url);
-
-        String updateStr = "UPDATE REDIRECTS SET R_COUNT = ? WHERE URL = ?;";
-        int futureCount = redirectInfo.getCount() + 1;
-
-        Connection conn = _pool.getConnection();
-        PreparedStatement stmt = null;
-        try {
-            stmt = conn.prepareStatement(updateStr);
-            stmt.setInt(1, futureCount);
-            stmt.setString(2, url);
-            stmt.executeUpdate();
-
-            RedirectInfo result = selectByUrl(url);
-            if (!_countWasChanged(futureCount, result)) return false;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            close(stmt);
-            close(conn);
+    @Override
+    public void addOrIncrementCount(String url) throws PersistException {
+        if (getByUrl(url) == null) {
+            if (_insertRedirectInfo(url) == 0) throw new PersistException();
+            return;
         }
 
-        return true;
+        if (!_increaseCountByUrl(url)) throw new PersistException();
     }
 
     private int _insertRedirectInfo(String url) {
@@ -161,8 +130,8 @@ public class H2RedirectInfoDao implements RedirectInfoDao {
             stmt.setString(1, url);
             stmt.executeUpdate();
 
-            RedirectInfo redirectInfo = selectByUrl(url);
-            return redirectInfo.getId();
+            Redirect redirect = getByUrl(url);
+            return redirect.getId();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -173,24 +142,54 @@ public class H2RedirectInfoDao implements RedirectInfoDao {
         return 0;
     }
 
-    private boolean _isEmpty(ResultSet rs) throws SQLException {
-        return !rs.next();
+    private boolean _increaseCountByUrl(String url) {
+        Redirect redirect = getByUrl(url);
+
+        String updateStr = "UPDATE REDIRECTS SET R_COUNT = ? WHERE URL = ?;";
+        int futureCount = redirect.getCount() + 1;
+
+        Connection conn = _pool.getConnection();
+        PreparedStatement stmt = null;
+        try {
+            stmt = conn.prepareStatement(updateStr);
+            stmt.setInt(1, futureCount);
+            stmt.setString(2, url);
+            stmt.executeUpdate();
+
+            Redirect result = getByUrl(url);
+            if (!_countChanged(futureCount, result)) return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(stmt);
+            close(conn);
+        }
+
+        return true;
     }
 
-    private List<RedirectInfo> _parseRedirectInfoList(ResultSet rs) throws SQLException {
-        List<RedirectInfo> infoList = new ArrayList<>();
+    private List<Redirect> _parseRedirectInfoList(ResultSet rs) throws SQLException {
+        List<Redirect> infoList = new ArrayList<>();
         do {
             int id = rs.getInt(1);
             String url = rs.getString(2);
             int count = rs.getInt(3);
 
-            infoList.add(new RedirectInfo(id, url, count));
+            infoList.add(new Redirect(id, url, count));
         } while (rs.next());
 
         return infoList;
     }
 
-    private boolean _countWasChanged(int count, RedirectInfo result) {
+    private boolean redirectNotFound(int id) {
+        return id == 0;
+    }
+
+    private boolean _isEmpty(ResultSet rs) throws SQLException {
+        return !rs.next();
+    }
+
+    private boolean _countChanged(int count, Redirect result) {
         return result.getCount() == count;
     }
 }

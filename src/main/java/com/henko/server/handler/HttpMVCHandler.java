@@ -2,7 +2,7 @@ package com.henko.server.handler;
 
 import com.henko.server.controller.Controller;
 import com.henko.server.dao.exception.PersistException;
-import com.henko.server.model.ConnectionInfo;
+import com.henko.server.model.Connect;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -27,12 +27,12 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
 
-    private final ConnectionInfo _connInfo;
+    private final Connect _connInfo;
     private final Controller _controller = new Controller();
 
     private static final Charset CONTENT_CHARSET = Charset.forName("UTF-8");
 
-    public HttpMVCHandler(ConnectionInfo connInfo) {
+    public HttpMVCHandler(Connect connInfo) {
         this._connInfo = connInfo;
     }
 
@@ -91,7 +91,7 @@ public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void _saveRedirectInfoData(String url) throws PersistException {
-        getDaoFactory(H2).getRedirectInfoDao().addOrIncrementCount(url);
+        getDaoFactory(H2).getRedirectDao().addOrIncrementCount(url);
     }
 
     private FullHttpResponse _generateFullHttpResponse(ByteBuf pageContent) {

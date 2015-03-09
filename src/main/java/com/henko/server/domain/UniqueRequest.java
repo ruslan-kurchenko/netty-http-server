@@ -2,16 +2,16 @@ package com.henko.server.domain;
 
 import java.util.Date;
 
-public class UniqueRequestInfo {
+public class UniqueRequest {
     private String ip;
     private int count;
-    private Date lastConn;
+    private long lastConn;
 
-    public UniqueRequestInfo() {
+    public UniqueRequest() {
         
     }
 
-    public UniqueRequestInfo(String ip, int count, Date lastConn) {
+    public UniqueRequest(String ip, int count, long lastConn) {
         this.ip = ip;
         this.count = count;
         this.lastConn = lastConn;
@@ -33,11 +33,11 @@ public class UniqueRequestInfo {
         this.count = count;
     }
 
-    public Date getLastConn() {
+    public long getLastConn() {
         return lastConn;
     }
 
-    public void setLastConn(Date lastConn) {
+    public void setLastConn(long lastConn) {
         this.lastConn = lastConn;
     }
 
@@ -46,11 +46,11 @@ public class UniqueRequestInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UniqueRequestInfo that = (UniqueRequestInfo) o;
+        UniqueRequest that = (UniqueRequest) o;
 
         if (count != that.count) return false;
+        if (lastConn != that.lastConn) return false;
         if (ip != null ? !ip.equals(that.ip) : that.ip != null) return false;
-        if (lastConn != null ? !lastConn.equals(that.lastConn) : that.lastConn != null) return false;
 
         return true;
     }
@@ -59,16 +59,16 @@ public class UniqueRequestInfo {
     public int hashCode() {
         int result = ip != null ? ip.hashCode() : 0;
         result = 31 * result + count;
-        result = 31 * result + (lastConn != null ? lastConn.hashCode() : 0);
+        result = 31 * result + (int) (lastConn ^ (lastConn >>> 32));
         return result;
     }
 
     @Override
     public String toString() {
-        return "UniqueRequestInfo{" +
+        return "UniqueRequest{" +
                 "ip='" + ip + '\'' +
                 ", count=" + count +
-                ", lastConn=" + lastConn +
+                ", lastConn=" + new Date(lastConn) +
                 '}';
     }
 }

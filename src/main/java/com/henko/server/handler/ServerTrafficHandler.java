@@ -1,7 +1,7 @@
 package com.henko.server.handler;
 
-import com.henko.server.dao.ConnectionInfoDao;
-import com.henko.server.model.ConnectionInfo;
+import com.henko.server.dao.ConnectDao;
+import com.henko.server.model.Connect;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.traffic.ChannelTrafficShapingHandler;
 
@@ -9,8 +9,8 @@ import static com.henko.server.dao.impl.DaoFactory.*;
 
 public class ServerTrafficHandler extends ChannelTrafficShapingHandler {
 
-    private ConnectionInfoDao connInfoDao;
-    private ConnectionInfo connInfo;
+    private ConnectDao connInfoDao;
+    private Connect connInfo;
 
     private double durationMillis;
     private long receivedBytes;
@@ -20,10 +20,10 @@ public class ServerTrafficHandler extends ChannelTrafficShapingHandler {
         super(checkInterval);
     }
 
-    public ServerTrafficHandler(long checkInterval, ConnectionInfo connInfo) {
+    public ServerTrafficHandler(long checkInterval, Connect connInfo) {
         this(checkInterval);
 
-        this.connInfoDao = getDaoFactory(H2).getConnectionInfoDao();
+        this.connInfoDao = getDaoFactory(H2).getConnectionDao();
         this.connInfo = connInfo;
     }
 

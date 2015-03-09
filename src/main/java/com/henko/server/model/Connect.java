@@ -1,9 +1,8 @@
 package com.henko.server.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
-public class ConnectionInfo implements Serializable {
+public class Connect implements Serializable {
     private int id;
     private String ip;
     private String uri;
@@ -12,13 +11,13 @@ public class ConnectionInfo implements Serializable {
     private long receivedBytes;
     private long speed;
 
-    public ConnectionInfo() {
+    public Connect() {
         
     }
 
-    public ConnectionInfo(int id, String ip, String uri, 
-                          long timestamp, long sendBytes,
-                          long receivedBytes, long speed) {
+    public Connect(int id, String ip, String uri,
+                   long timestamp, long sendBytes,
+                   long receivedBytes, long speed) {
         this.id = id;
         this.ip = ip;
         this.uri = uri;
@@ -28,9 +27,9 @@ public class ConnectionInfo implements Serializable {
         this.speed = speed;
     }
 
-    public ConnectionInfo(String ip, String uri,
-                          long timestamp, long sendBytes,
-                          long receivedBytes, long speed) {
+    public Connect(String ip, String uri,
+                   long timestamp, long sendBytes,
+                   long receivedBytes, long speed) {
         this.ip = ip;
         this.uri = uri;
         this.timestamp = timestamp;
@@ -100,7 +99,7 @@ public class ConnectionInfo implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ConnectionInfo that = (ConnectionInfo) o;
+        Connect that = (Connect) o;
 
         if (id != that.id) return false;
         if (receivedBytes != that.receivedBytes) return false;

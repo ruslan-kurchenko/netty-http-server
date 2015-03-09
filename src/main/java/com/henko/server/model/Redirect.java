@@ -2,15 +2,15 @@ package com.henko.server.model;
 
 import java.io.Serializable;
 
-public class RedirectInfo  implements Serializable {
+public class Redirect implements Serializable {
     private int id;
     private String url;
     private int count;
 
-    public RedirectInfo() {
+    public Redirect() {
     }
 
-    public RedirectInfo(int id, String url, int count) {
+    public Redirect(int id, String url, int count) {
         this.id = id;
         this.url = url;
         this.count = count;
@@ -45,7 +45,7 @@ public class RedirectInfo  implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        RedirectInfo that = (RedirectInfo) o;
+        Redirect that = (Redirect) o;
 
         if (count != that.count) return false;
         if (id != that.id) return false;

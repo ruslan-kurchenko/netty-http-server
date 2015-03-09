@@ -1,17 +1,15 @@
-import com.henko.server.dao.ConnectionInfoDao;
+import com.henko.server.dao.ConnectDao;
 import com.henko.server.dao.impl.DaoFactory;
 import com.henko.server.db.DBManager;
 import com.henko.server.db.HikariConnPool;
-import com.henko.server.domain.UniqueRequestInfo;
-import com.henko.server.model.ConnectionInfo;
+import com.henko.server.domain.UniqueRequest;
+import com.henko.server.model.Connect;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static com.henko.server.dao.impl.DaoFactory.*;
@@ -22,7 +20,7 @@ public class TestH2ConnectionInfoDao {
 
     HikariConnPool pool = HikariConnPool.getConnPool();
     DaoFactory daoFactory = getDaoFactory(H2);
-    ConnectionInfoDao dao = daoFactory.getConnectionInfoDao();
+    ConnectDao dao = daoFactory.getConnectionDao();
 
     @Before
     public void setUp() throws SQLException {
@@ -36,7 +34,7 @@ public class TestH2ConnectionInfoDao {
     long secondRowTime = System.currentTimeMillis();
     long thirdRowTime = System.currentTimeMillis();
     private void initialiseDBData() throws SQLException {
-        Connection conn = pool.getConnection();
+        java.sql.Connection conn = pool.getConnection();
         Statement stmt = conn.createStatement();
 
         String insert1DataSQL = "INSERT INTO " +
@@ -58,33 +56,33 @@ public class TestH2ConnectionInfoDao {
 
     @Test
     public void testSelectById() {
-        ConnectionInfo expected = new ConnectionInfo(1, "111.11.11.11", "/hello", firstRowTime, 100, 100, 200);
-        ConnectionInfo actual = dao.selectById(1);
+        Connect expected = new Connect(1, "111.11.11.11", "/hello", firstRowTime, 100, 100, 200);
+        Connect actual = dao.getById(1);
 
         assertEquals(expected, actual);
     }
 
     @Test
     public void testSelectAll() {
-        List<ConnectionInfo> expected = new ArrayList<ConnectionInfo>(){{
-            add(new ConnectionInfo(1, "111.11.11.11", "/hello", firstRowTime, 100, 100, 200));
-            add(new ConnectionInfo(2, "222.22.22.22", "/hello", secondRowTime, 100, 100, 200));
-            add(new ConnectionInfo(3, "222.22.22.22", "/status", thirdRowTime, 100, 100, 200));
+        List<Connect> expected = new ArrayList<Connect>(){{
+            add(new Connect(1, "111.11.11.11", "/hello", firstRowTime, 100, 100, 200));
+            add(new Connect(2, "222.22.22.22", "/hello", secondRowTime, 100, 100, 200));
+            add(new Connect(3, "222.22.22.22", "/status", thirdRowTime, 100, 100, 200));
         }};
 
-        List<ConnectionInfo> actual = dao.selectAll();
+        List<Connect> actual = dao.getAll();
 
         assertEquals(expected, actual);
     }
 
     @Test
     public void testUniqueRequestInfo() {
-        List<UniqueRequestInfo> expected = new ArrayList<UniqueRequestInfo>(){{
-            add(new UniqueRequestInfo("222.22.22.22", 2, new Date(thirdRowTime)));
-            add(new UniqueRequestInfo("111.11.11.11", 1, new Date(firstRowTime)));
+        List<UniqueRequest> expected = new ArrayList<UniqueRequest>(){{
+            add(new UniqueRequest("222.22.22.22", 2, thirdRowTime));
+            add(new UniqueRequest("111.11.11.11", 1, firstRowTime));
         }};
 
-        List<UniqueRequestInfo> actual = dao.selectUniqueRequestInfo();
+        List<UniqueRequest> actual = dao.getNUniqueRequest(3);
 
         assertEquals(expected, actual);
     }
@@ -92,12 +90,12 @@ public class TestH2ConnectionInfoDao {
     @Test
     public void testInsertConnectionInfo() {
         long timeStamp = 555555555;
-        ConnectionInfo expected = new ConnectionInfo(4, "555.55.55.55", "/status", timeStamp, 500, 500, 200);
+        Connect expected = new Connect(4, "555.55.55.55", "/status", timeStamp, 500, 500, 200);
 
-        assertNull(dao.selectById(4));
+        assertNull(dao.getById(4));
 
         dao.insertConnectionInfo(expected);
-        ConnectionInfo actual = dao.selectById(4);
+        Connect actual = dao.getById(4);
 
         assertEquals(expected, actual);
     }
@@ -123,7 +121,7 @@ public class TestH2ConnectionInfoDao {
     @Test
     public void testSelectNumberOfUniqueRequest() {
         int expected = 2;
-        int actual = dao.selectNumberOfUniqueRequest();
+        int actual = dao.getNumOfUniqueRequest();
 
         assertEquals(expected, actual);
     }
@@ -131,7 +129,7 @@ public class TestH2ConnectionInfoDao {
     @Test
     public void testSelectNumberOfAllRequests(){
         int expected = 3;
-        int actual = dao.selectNumberOfAllRequests();
+        int actual = dao.getNumOfAllRequests();
 
         assertEquals(expected, actual);
     }
