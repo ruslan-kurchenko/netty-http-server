@@ -54,7 +54,7 @@ public class ServerTrafficHandler extends ChannelTrafficShapingHandler {
         connInfo.setSendBytes(sendBytes);
         connInfo.setSpeed(speed);
 
-        connInfoDao.insertConnectionInfo(connInfo);
+        connInfoDao.insertConnect(connInfo);
 
 //        System.err.println("\nstart - " + connInfo.getTimestamp() + ", end - " + stopConnTimeStamp + ", duration - " + durationMillis);
 //        System.err.println("handler removed: duration: - " + durationMillis + ", received_b - " + receivedBytes +

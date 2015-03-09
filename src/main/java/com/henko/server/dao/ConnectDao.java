@@ -15,11 +15,11 @@ public interface ConnectDao {
 
     public List<UniqueRequest> getNUniqueRequest(int amount);
 
-    public int getNumOfUniqueRequest();
+    public int getNumOfUniqueConn();
 
     public int getNumOfCurrentConn();
 
-    public int getNumOfAllRequests();
+    public int getNumOfAllConn();
 
-    public void insertConnectionInfo(Connect connect);
+    public void insertConnect(Connect connect);
 }

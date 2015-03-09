@@ -129,32 +129,12 @@ public class H2ConnectDao implements ConnectDao {
     }
 
     @Override
-    public int getNumOfAllRequests() {
-        String selectStr = "SELECT COUNT(SRC_IP) FROM CONNECTIONS;";
-
-        Connection conn = _pool.getConnection();
-        Statement stmt = null;
-        ResultSet rs = null;
-        try {
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(selectStr);
-
-            if (_isEmpty(rs)) return 0;
-
-            return rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            close(rs);
-            close(stmt);
-            close(conn);
-        }
-
-        return 0;
+    public int getNumOfAllConn() {
+        return NumberConnectionHandler.getAllConnCount();
     }
 
     @Override
-    public int getNumOfUniqueRequest() {
+    public int getNumOfUniqueConn() {
         String selectStr = "SELECT COUNT(DISTINCT SRC_IP) FROM CONNECTIONS;";
 
         Connection conn = _pool.getConnection();
@@ -184,7 +164,7 @@ public class H2ConnectDao implements ConnectDao {
     }
 
     @Override
-    public void insertConnectionInfo(Connect connInfo) {
+    public void insertConnect(Connect connect) {
         String insertStr = "INSERT INTO " +
                 "CONNECTIONS(SRC_IP, URI, TIME_STAMP, SEND_B, RECEIVED_B, SPEED) " +
                 "VALUES (?, ?, ?, ?, ?, ?);";
@@ -193,12 +173,12 @@ public class H2ConnectDao implements ConnectDao {
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(insertStr);
-            stmt.setString(1, connInfo.getIp());
-            stmt.setString(2, connInfo.getUri());
-            stmt.setLong(3, connInfo.getTimestamp());
-            stmt.setLong(4, connInfo.getSendBytes());
-            stmt.setLong(5, connInfo.getReceivedBytes());
-            stmt.setLong(6, connInfo.getSpeed());
+            stmt.setString(1, connect.getIp());
+            stmt.setString(2, connect.getUri());
+            stmt.setLong(3, connect.getTimestamp());
+            stmt.setLong(4, connect.getSendBytes());
+            stmt.setLong(5, connect.getReceivedBytes());
+            stmt.setLong(6, connect.getSpeed());
             stmt.executeUpdate();
 
         } catch (SQLException e) {

@@ -7,9 +7,9 @@ import com.henko.server.domain.ServerStatus;
 import com.henko.server.domain.UniqueRequest;
 import com.henko.server.model.Connect;
 import com.henko.server.model.Redirect;
-import com.henko.server.view.impl.ErrorPage;
-import com.henko.server.view.impl.HelloPage;
-import com.henko.server.view.impl.StatusPage;
+import com.henko.server.view.ErrorPage;
+import com.henko.server.view.HelloPage;
+import com.henko.server.view.StatusPage;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -69,8 +69,8 @@ public class Controller {
         ConnectDao connDao = _daoFactory.getConnectionDao();
         List<Connect> connList = connDao.getLastNConn(CONNECT_AMOUNT);
         List<UniqueRequest> uniqueRequestList = connDao.getNUniqueRequest(UNIQUE_REQ_AMOUNT);
-        int requests = connDao.getNumOfAllRequests();
-        int uniqueRequest = connDao.getNumOfUniqueRequest();
+        int requests = connDao.getNumOfAllConn();
+        int uniqueRequest = connDao.getNumOfUniqueConn();
         int currentConn = connDao.getNumOfCurrentConn();
 
         RedirectDao redirectDao = _daoFactory.getRedirectDao();

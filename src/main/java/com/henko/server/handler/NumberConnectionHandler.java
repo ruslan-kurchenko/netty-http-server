@@ -7,7 +7,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class NumberConnectionHandler extends ChannelTrafficShapingHandler {
 
-    private static final AtomicInteger _CONNECTION_COUNT = new AtomicInteger();
+    private static final AtomicInteger CURRENT_CONNECTION_COUNT = new AtomicInteger();
+    private static final AtomicInteger ALL_CONNECTION_COUNT = new AtomicInteger();
 
     public NumberConnectionHandler(long checkInterval) {
         super(checkInterval);
@@ -16,7 +17,8 @@ public class NumberConnectionHandler extends ChannelTrafficShapingHandler {
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-        _CONNECTION_COUNT.incrementAndGet();
+        CURRENT_CONNECTION_COUNT.incrementAndGet();
+        ALL_CONNECTION_COUNT.incrementAndGet();
 
         super.handlerAdded(ctx);
     }
@@ -25,10 +27,14 @@ public class NumberConnectionHandler extends ChannelTrafficShapingHandler {
     public synchronized void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         super.handlerRemoved(ctx);
 
-        _CONNECTION_COUNT.decrementAndGet();
+        CURRENT_CONNECTION_COUNT.decrementAndGet();
     }
 
     public static int getConnectionCount(){
-        return _CONNECTION_COUNT.get();
+        return CURRENT_CONNECTION_COUNT.get();
+    }
+
+    public static int getAllConnCount() {
+        return ALL_CONNECTION_COUNT.get();
     }
 }

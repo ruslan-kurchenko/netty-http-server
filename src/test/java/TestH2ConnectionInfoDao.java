@@ -94,7 +94,7 @@ public class TestH2ConnectionInfoDao {
 
         assertNull(dao.getById(4));
 
-        dao.insertConnectionInfo(expected);
+        dao.insertConnect(expected);
         Connect actual = dao.getById(4);
 
         assertEquals(expected, actual);
@@ -108,7 +108,7 @@ public class TestH2ConnectionInfoDao {
 //            timestamp = System.currentTimeMillis();
 //            expected = new ConnectionInfo("111.11.11.11", "/hello", timestamp, 100, 100, 200);
 //
-//            dao.insertConnectionInfo(expected);
+//            dao.insertConnect(expected);
 //
 //            System.out.println(dao.selectByTimeStamp(timestamp));
 //        }
@@ -121,7 +121,7 @@ public class TestH2ConnectionInfoDao {
     @Test
     public void testSelectNumberOfUniqueRequest() {
         int expected = 2;
-        int actual = dao.getNumOfUniqueRequest();
+        int actual = dao.getNumOfUniqueConn();
 
         assertEquals(expected, actual);
     }
@@ -129,7 +129,7 @@ public class TestH2ConnectionInfoDao {
     @Test
     public void testSelectNumberOfAllRequests(){
         int expected = 3;
-        int actual = dao.getNumOfAllRequests();
+        int actual = dao.getNumOfAllConn();
 
         assertEquals(expected, actual);
     }

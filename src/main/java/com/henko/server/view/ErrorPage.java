@@ -1,4 +1,4 @@
-package com.henko.server.view.impl;
+package com.henko.server.view;
 
 import com.henko.server.view.Page;
 import io.netty.buffer.ByteBuf;
