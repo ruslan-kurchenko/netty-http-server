@@ -1,7 +1,7 @@
 import com.henko.server.dao.ConnectionInfoDao;
 import com.henko.server.dao.impl.DaoFactory;
 import com.henko.server.db.DBManager;
-import com.henko.server.db.connectionpool.HikariConnPool;
+import com.henko.server.db.HikariConnPool;
 import com.henko.server.domain.UniqueRequestInfo;
 import com.henko.server.model.ConnectionInfo;
 import org.junit.Before;

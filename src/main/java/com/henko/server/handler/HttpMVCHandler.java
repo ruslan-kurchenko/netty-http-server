@@ -1,12 +1,9 @@
 package com.henko.server.handler;
 
 import com.henko.server.controller.Controller;
-import com.henko.server.controller.PathRegistry;
-import com.henko.server.dao.ConnectionInfoDao;
-import com.henko.server.dao.impl.DaoFactory;
+import com.henko.server.dao.exception.PersistException;
 import com.henko.server.model.ConnectionInfo;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -15,10 +12,7 @@ import io.netty.handler.codec.http.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Map;
 
 import static com.henko.server.controller.PathRegistry.*;
 import static com.henko.server.dao.impl.DaoFactory.*;
@@ -33,14 +27,13 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
 
-    private final ConnectionInfo connInfo;
-    private final Controller controller;
+    private final ConnectionInfo _connInfo;
+    private final Controller _controller = new Controller();
 
     private static final Charset CONTENT_CHARSET = Charset.forName("UTF-8");
 
     public HttpMVCHandler(ConnectionInfo connInfo) {
-        this.connInfo = connInfo;
-        this.controller = new Controller();
+        this._connInfo = connInfo;
     }
 
     @Override
@@ -48,53 +41,60 @@ public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
         if ( !(msg instanceof HttpRequest) ) return;
         HttpRequest req = (HttpRequest) msg;
 
-        saveConnInfoData(ctx, req);
+        _saveConnInfoData(ctx, req);
 
-        if (is100ContinueExpected(req)) write100ContinueResponse(ctx);
+        if (is100ContinueExpected(req)) _write100ContinueResponse(ctx);
 
-        String clientPath = parseClientPath(req);
+        String clientPath = _parseClientPath(req);
 
-        if (isRedirect(clientPath)) {
-            processRedirect(ctx, req);
+        if (_isRedirect(clientPath)) {
+            _processRedirect(ctx, req);
             return;
         }
 
-        ByteBuf pageContent = controller.getPageContent(clientPath, CONTENT_CHARSET);
-        FullHttpResponse resp = generateFullHttpResponse(pageContent);
+        ByteBuf pageContent = _controller.getPageContent(clientPath, CONTENT_CHARSET);
+        FullHttpResponse resp = _generateFullHttpResponse(pageContent);
 
-        writeFullHttpResponse(ctx, req, resp);
+        _writeFullHttpResponse(ctx, req, resp);
     }
 
-    private void saveConnInfoData(ChannelHandlerContext ctx, HttpRequest req) throws URISyntaxException {
+    private void _saveConnInfoData(ChannelHandlerContext ctx, HttpRequest req) throws URISyntaxException {
         InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
         String ip = inetSocketAddress.getAddress().getHostAddress();
-        String uri = parseClientPath(req);
+        String uri = _parseClientPath(req);
 
-        connInfo.setIp(ip);
-        connInfo.setUri(uri);
+        _connInfo.setIp(ip);
+        _connInfo.setUri(uri);
     }
 
-    private void write100ContinueResponse(ChannelHandlerContext ctx) {
+    private void _write100ContinueResponse(ChannelHandlerContext ctx) {
         ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
     }
 
-    private String parseClientPath(HttpRequest req) throws URISyntaxException {
+    private String _parseClientPath(HttpRequest req) throws URISyntaxException {
         URI uri = new URI(req.getUri().toLowerCase());
         return uri.getPath();
     }
 
-    private boolean isRedirect(String clientPath) {
+    private boolean _isRedirect(String clientPath) {
         return REDIRECT.equals(clientPath);
     }
 
-    private void processRedirect(ChannelHandlerContext ctx, HttpRequest req) throws URISyntaxException {
-        String url = controller.parseRedirectUrl(req);
+    private void _processRedirect(ChannelHandlerContext ctx, HttpRequest req) throws Exception {
+        String url = _controller.parseRedirectUrl(req);
+
+        _saveRedirectInfoData(url);
+
         FullHttpResponse resp = new DefaultFullHttpResponse(HTTP_1_1, FOUND);
         resp.headers().set(LOCATION, url);
         ctx.writeAndFlush(resp).addListener(ChannelFutureListener.CLOSE);
     }
 
-    private FullHttpResponse generateFullHttpResponse(ByteBuf pageContent) {
+    private void _saveRedirectInfoData(String url) throws PersistException {
+        getDaoFactory(H2).getRedirectInfoDao().addOrIncrementCount(url);
+    }
+
+    private FullHttpResponse _generateFullHttpResponse(ByteBuf pageContent) {
         FullHttpResponse resp = new DefaultFullHttpResponse(HTTP_1_1, OK, pageContent);
         resp.headers().set(CONTENT_TYPE, "text/html");
         resp.headers().set(CONTENT_LENGTH, resp.content().readableBytes());
@@ -102,7 +102,7 @@ public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
         return resp;
     }
 
-    private void writeFullHttpResponse(ChannelHandlerContext ctx, HttpRequest req, FullHttpResponse resp) {
+    private void _writeFullHttpResponse(ChannelHandlerContext ctx, HttpRequest req, FullHttpResponse resp) {
         if (!isKeepAlive(req)) {
             ctx.write(resp).addListener(ChannelFutureListener.CLOSE);
         } else {

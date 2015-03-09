@@ -1,7 +1,5 @@
 package com.henko.server.db;
 
-import com.henko.server.db.connectionpool.HikariConnPool;
-
 import java.sql.*;
 
 import static com.henko.server.db.DBUtil.*;

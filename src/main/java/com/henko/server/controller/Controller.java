@@ -48,7 +48,7 @@ public class Controller {
         int numberOfCurrentConn = connectionInfoDao.selectNumberOfCurrentConn();
 
         RedirectInfoDao redirectInfoDao = daoFactory.getRedirectInfoDao();
-        List<RedirectInfo> redirectInfoList = redirectInfoDao.selectAll();
+        List<RedirectInfo> redirectInfoList = redirectInfoDao.selectListByMaxCount(3);
 
         ServerStatus serverStatus = new ServerStatus();
         serverStatus.setNumberOfAllRequests(numberOfAllRequests);

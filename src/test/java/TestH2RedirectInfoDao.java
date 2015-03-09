@@ -1,5 +1,5 @@
 import com.henko.server.dao.RedirectInfoDao;
-import com.henko.server.db.connectionpool.HikariConnPool;
+import com.henko.server.db.HikariConnPool;
 import com.henko.server.dao.impl.DaoFactory;
 import com.henko.server.db.DBManager;
 import com.henko.server.model.RedirectInfo;
@@ -42,14 +42,6 @@ public class TestH2RedirectInfoDao {
     }
 
     @Test
-    public void testSelectById() {
-        RedirectInfo expected = new RedirectInfo(1, "google.com", 10);
-        RedirectInfo actual = redirectInfoDao.selectById(1);
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
     public void testSelectByUrl() {
         RedirectInfo expected = new RedirectInfo(1, "google.com", 10);
         RedirectInfo actual = redirectInfoDao.selectByUrl("google.com");
@@ -70,29 +62,4 @@ public class TestH2RedirectInfoDao {
         assertEquals(expected, actual);
     }
 
-    @Test
-    public void testUpdateCountByUrl() {
-        RedirectInfo expected = new RedirectInfo(1, "google.com", 11);
-        redirectInfoDao.updateCountByUrl("google.com", 11);
-        RedirectInfo actual = redirectInfoDao.selectByUrl("google.com");
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void testIncreaseCountByUrl() {
-        RedirectInfo expected = new RedirectInfo(1, "google.com", 11);
-        redirectInfoDao.increaseCountByUrl("google.com");
-        RedirectInfo actual = redirectInfoDao.selectByUrl("google.com");
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void testPersist(){
-        int expectedId = 4;
-        int actualId = redirectInfoDao.persistRedirectInfo("w3school.com");
-
-        assertEquals(expectedId, actualId);
-    }
 }
