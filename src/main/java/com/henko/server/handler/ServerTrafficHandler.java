@@ -1,17 +1,13 @@
 package com.henko.server.handler;
 
 import com.henko.server.dao.ConnectionInfoDao;
-import com.henko.server.dao.impl.DaoFactory;
 import com.henko.server.model.ConnectionInfo;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.traffic.ChannelTrafficShapingHandler;
-import io.netty.handler.traffic.TrafficCounter;
-
-import java.util.Date;
 
 import static com.henko.server.dao.impl.DaoFactory.*;
 
-public class HttpTrafficCounter extends ChannelTrafficShapingHandler {
+public class ServerTrafficHandler extends ChannelTrafficShapingHandler {
 
     private ConnectionInfoDao connInfoDao;
     private ConnectionInfo connInfo;
@@ -20,11 +16,11 @@ public class HttpTrafficCounter extends ChannelTrafficShapingHandler {
     private long receivedBytes;
     private long sendBytes;
 
-    private HttpTrafficCounter(long checkInterval) {
+    private ServerTrafficHandler(long checkInterval) {
         super(checkInterval);
     }
 
-    public HttpTrafficCounter(long checkInterval, ConnectionInfo connInfo) {
+    public ServerTrafficHandler(long checkInterval, ConnectionInfo connInfo) {
         this(checkInterval);
 
         this.connInfoDao = getDaoFactory(H2).getConnectionInfoDao();

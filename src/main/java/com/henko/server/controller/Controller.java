@@ -41,7 +41,7 @@ public class Controller {
 
     private ByteBuf processPageStatus(Charset charset) {
         ConnectionInfoDao connectionInfoDao = daoFactory.getConnectionInfoDao();
-        List<ConnectionInfo> connectionInfoList = connectionInfoDao.selectAll();
+        List<ConnectionInfo> connectionInfoList = connectionInfoDao.selectLast16ConnInfo();
         List<UniqueRequestInfo> uniqueRequestInfoList = connectionInfoDao.selectUniqueRequestInfo();
         int numberOfAllRequests = connectionInfoDao.selectNumberOfAllRequests();
         int numberOfUniqueRequest = connectionInfoDao.selectNumberOfUniqueRequest();
@@ -64,7 +64,7 @@ public class Controller {
     }
 
     private ByteBuf processPageHello(Charset charset) throws InterruptedException {
-        Thread.currentThread().sleep(10000);
+        //Thread.sleep(10000);
 
         return new HelloPage().getContent(charset);
     }

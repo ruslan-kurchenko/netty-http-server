@@ -13,11 +13,12 @@ public interface ConnectionInfoDao {
 
     public List<ConnectionInfo> selectAll();
 
+    public List<ConnectionInfo> selectLast16ConnInfo();
+
     public List<UniqueRequestInfo> selectUniqueRequestInfo();
 
     public void insertConnectionInfo(ConnectionInfo connectionInfo);
 
-    public boolean deleteConnectionInfo();
 
     public int selectNumberOfUniqueRequest();
 

@@ -3,9 +3,8 @@ package com.henko.server.dao.impl;
 import com.henko.server.dao.ConnectionInfoDao;
 import com.henko.server.db.connectionpool.HikariConnPool;
 import com.henko.server.domain.UniqueRequestInfo;
-import com.henko.server.handler.HttpConnectionCountHandler;
+import com.henko.server.handler.NumberConnectionHandler;
 import com.henko.server.model.ConnectionInfo;
-import com.henko.server.model.RedirectInfo;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -150,11 +149,6 @@ public class H2ConnectionInfoDao implements ConnectionInfoDao{
     }
 
     @Override
-    public boolean deleteConnectionInfo() {
-        return false;
-    }
-
-    @Override
     public int selectNumberOfUniqueRequest() {
         String selectStr = "SELECT COUNT(DISTINCT SRC_IP) FROM CONNECTIONS;";
 
@@ -181,7 +175,7 @@ public class H2ConnectionInfoDao implements ConnectionInfoDao{
 
     @Override
     public int selectNumberOfCurrentConn() {
-        return HttpConnectionCountHandler.getConnectionCount();
+        return NumberConnectionHandler.getConnectionCount();
     }
 
     @Override
@@ -209,6 +203,50 @@ public class H2ConnectionInfoDao implements ConnectionInfoDao{
         return 0;
     }
 
+    @Override
+    public List<ConnectionInfo> selectLast16ConnInfo() {
+//        String selectStr = "" +
+//                "SELECT * " +
+//                "FROM CONNECTIONS " +
+//                "WHERE ID_CONNECTION IN " +
+//                "                       ( " +
+//                "                          SELECT TOP(16) ID_CONNECTION " +
+//                "                          FROM CONNECTIONS " +
+//                "                          ORDER BY ID_CONNECTION DESC" +
+//                "                       ) " +
+//                "ORDER BY ID_CONNECTION ASC;";
+
+//        String selectStr = "SELECT * \n" +
+//                "FROM (" +
+//                "       SELECT * " +
+//                "       FROM CONNECTIONS " +
+//                "       ORDER BY ID_CONNECTION DESC LIMIT 3" +
+//                "     ) AS tbl " +
+//                "ORDER BY tbl.ID_CONNECTION ASC;";
+//
+//
+        String selectStr = "SELECT * FROM CONNECTIONS LIMIT 16;";
+
+        Connection conn = pool.getConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(selectStr);
+
+            if (isEmpty(rs)) return null;
+
+            return parseConnectionInfoList(rs);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(rs);
+            close(stmt);
+            close(conn);
+        }
+
+        return null;
+    }
 
     /**************************************
      * Inner helper methods:

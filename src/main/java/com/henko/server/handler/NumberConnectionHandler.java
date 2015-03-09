@@ -5,18 +5,18 @@ import io.netty.handler.traffic.ChannelTrafficShapingHandler;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class HttpConnectionCountHandler extends ChannelTrafficShapingHandler {
+public class NumberConnectionHandler extends ChannelTrafficShapingHandler {
 
-    private static final AtomicInteger connectionCount = new AtomicInteger();
+    private static final AtomicInteger _CONNECTION_COUNT = new AtomicInteger();
 
-    public HttpConnectionCountHandler(long checkInterval) {
+    public NumberConnectionHandler(long checkInterval) {
         super(checkInterval);
     }
 
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-        connectionCount.incrementAndGet();
+        _CONNECTION_COUNT.incrementAndGet();
 
         super.handlerAdded(ctx);
     }
@@ -25,10 +25,10 @@ public class HttpConnectionCountHandler extends ChannelTrafficShapingHandler {
     public synchronized void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         super.handlerRemoved(ctx);
 
-        connectionCount.decrementAndGet();
+        _CONNECTION_COUNT.decrementAndGet();
     }
 
     public static int getConnectionCount(){
-        return connectionCount.get();
+        return _CONNECTION_COUNT.get();
     }
 }

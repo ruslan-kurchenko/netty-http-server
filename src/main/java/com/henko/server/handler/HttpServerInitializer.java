@@ -10,22 +10,22 @@ import io.netty.handler.ssl.SslContext;
 
 public class HttpServerInitializer extends ChannelInitializer<SocketChannel>{
     
-    private final SslContext sslCtx;
-    private final ConnectionInfo connectionInfo;
+    private final SslContext _sslCtx;
+    private final ConnectionInfo _connectionInfo = new ConnectionInfo();
 
-    public HttpServerInitializer(SslContext sslCtx) {
-        this.sslCtx = sslCtx;
-        this.connectionInfo = new ConnectionInfo();
+    public HttpServerInitializer(SslContext _sslCtx) {
+        this._sslCtx = _sslCtx;
     }
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline p = ch.pipeline();
-        if (sslCtx != null) p.addLast(sslCtx.newHandler(ch.alloc()));
+        if (_sslCtx != null) p.addLast(_sslCtx.newHandler(ch.alloc()));
 
-        p.addLast(new HttpTrafficCounter(0, connectionInfo));
-        p.addLast(new HttpConnectionCountHandler(0));
+        p.addLast(new ServerTrafficHandler(0, _connectionInfo));
+        p.addLast(new HttpDataBaseCleaner());
+        p.addLast(new NumberConnectionHandler(0));
         p.addLast(new HttpServerCodec());
-        p.addLast(new HttpMVCHandler(connectionInfo));
+        p.addLast(new HttpMVCHandler(_connectionInfo));
     }
 }

@@ -1,6 +1,8 @@
 package com.henko.server.model;
 
-public class RedirectInfo {
+import java.io.Serializable;
+
+public class RedirectInfo  implements Serializable {
     private int id;
     private String url;
     private int count;
