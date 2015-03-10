@@ -39,7 +39,7 @@ public class H2RedirectDao implements RedirectDao {
                 count = rs.getInt(3);
             }
 
-            if (redirectNotFound(id)) return null;
+            if (_redirectNotFound(id)) return null;
 
             info = new Redirect(id, url, count);
         } catch (SQLException e) {
@@ -181,7 +181,7 @@ public class H2RedirectDao implements RedirectDao {
         return infoList;
     }
 
-    private boolean redirectNotFound(int id) {
+    private boolean _redirectNotFound(int id) {
         return id == 0;
     }
 

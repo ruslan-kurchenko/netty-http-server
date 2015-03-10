@@ -22,11 +22,7 @@ public class TestH2RedirectDao {
     private DaoFactory _daoFactory = getDaoFactory(H2);
     private RedirectDao _redirectDao = _daoFactory.getRedirectDao();
 
-    private final static List<Redirect> _testData = new ArrayList<Redirect>(){{
-        add(new Redirect(1, "google.com", 1));
-        add(new Redirect(2, "vk.com", 2));
-        add(new Redirect(3, "facebook.com", 3));
-    }};
+    private final static List<Redirect> _testData = _generateTestData();
 
     @Before
     public void setUp() throws SQLException {
@@ -34,22 +30,6 @@ public class TestH2RedirectDao {
         dbManager.dropTables();
         dbManager.initialiseDB();
         initialiseDBData();
-    }
-
-    private void initialiseDBData() throws SQLException {
-        Connection conn = _pool.getConnection();
-        Statement stmt = conn.createStatement();
-
-        String insert1DataSQL = "INSERT INTO REDIRECTS (URL, R_COUNT) VALUES('google.com', 1);";
-        String insert2DataSQL = "INSERT INTO REDIRECTS (URL, R_COUNT) VALUES('vk.com', 2);";
-        String insert3DataSQL = "INSERT INTO REDIRECTS (URL, R_COUNT) VALUES('facebook.com', 3);";
-
-        stmt.executeUpdate(insert1DataSQL);
-        stmt.executeUpdate(insert2DataSQL);
-        stmt.executeUpdate(insert3DataSQL);
-
-        close(stmt);
-        close(conn);
     }
 
     @Test
@@ -91,6 +71,30 @@ public class TestH2RedirectDao {
         Redirect actual = _redirectDao.getByUrl(testUrl);
 
         assertEquals(expected, actual);
+    }
+
+    private void initialiseDBData() throws SQLException {
+        Connection conn = _pool.getConnection();
+        Statement stmt = conn.createStatement();
+
+        String insert1DataSQL = "INSERT INTO REDIRECTS (URL, R_COUNT) VALUES('google.com', 1);";
+        String insert2DataSQL = "INSERT INTO REDIRECTS (URL, R_COUNT) VALUES('vk.com', 2);";
+        String insert3DataSQL = "INSERT INTO REDIRECTS (URL, R_COUNT) VALUES('facebook.com', 3);";
+
+        stmt.executeUpdate(insert1DataSQL);
+        stmt.executeUpdate(insert2DataSQL);
+        stmt.executeUpdate(insert3DataSQL);
+
+        close(stmt);
+        close(conn);
+    }
+
+    private static ArrayList<Redirect> _generateTestData() {
+        return new ArrayList<Redirect>(){{
+            add(new Redirect(1, "google.com", 1));
+            add(new Redirect(2, "vk.com", 2));
+            add(new Redirect(3, "facebook.com", 3));
+        }};
     }
 
 }

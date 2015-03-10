@@ -143,7 +143,6 @@ public class StatusPage implements Page {
                     "</tr>\n";
         }
 
-
         return data;
     }
 

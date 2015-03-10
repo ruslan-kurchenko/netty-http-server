@@ -26,12 +26,7 @@ public class TestH2ConnectDao {
     private DaoFactory _daoFactory = getDaoFactory(H2);
     private ConnectDao _connectDao = _daoFactory.getConnectionDao();
 
-
-    private final static List<Connect> _testData = new ArrayList<Connect>(){{
-        add(new Connect(1, "111.11.11.11", "/hello", 1, 1, 1, 1));
-        add(new Connect(2, "222.22.22.22", "/redirect", 2, 2, 2, 2));
-        add(new Connect(3, "222.22.22.22", "/status", 3, 3, 3, 3));
-    }};
+    private final static List<Connect> _testData = _generateTestData();
 
     @Before
     public void setUp() throws SQLException {
@@ -39,30 +34,6 @@ public class TestH2ConnectDao {
         dbManager.dropTables();
         dbManager.initialiseDB();
         initialiseDBData();
-    }
-
-    private void initialiseDBData() throws SQLException {
-        Connection conn = _pool.getConnection();
-        Statement stmt = conn.createStatement();
-
-        String insert1DataSQL = "INSERT INTO " +
-                "CONNECTIONS(SRC_IP, URI, TIME_STAMP, SEND_B, RECEIVED_B, SPEED) " +
-                "VALUES ('111.11.11.11', '/hello', 1, 1, 1, 1);";
-
-        String insert2DataSQL = "INSERT INTO " +
-                "CONNECTIONS(SRC_IP, URI, TIME_STAMP, SEND_B, RECEIVED_B, SPEED) " +
-                "VALUES ('222.22.22.22', '/redirect', 2, 2, 2, 2);";
-
-        String insert3DataSQL = "INSERT INTO " +
-                "CONNECTIONS(SRC_IP, URI, TIME_STAMP, SEND_B, RECEIVED_B, SPEED) " +
-                "VALUES ('222.22.22.22', '/status', 3, 3, 3, 3);";
-
-        stmt.executeUpdate(insert1DataSQL);
-        stmt.executeUpdate(insert2DataSQL);
-        stmt.executeUpdate(insert3DataSQL);
-
-        close(stmt);
-        close(conn);
     }
 
     @Test
@@ -118,5 +89,37 @@ public class TestH2ConnectDao {
         Connect actual = _connectDao.getById(4);
 
         assertEquals(expected, actual);
+    }
+
+    private void initialiseDBData() throws SQLException {
+        Connection conn = _pool.getConnection();
+        Statement stmt = conn.createStatement();
+
+        String insert1DataSQL = "INSERT INTO " +
+                "CONNECTIONS(SRC_IP, URI, TIME_STAMP, SEND_B, RECEIVED_B, SPEED) " +
+                "VALUES ('111.11.11.11', '/hello', 1, 1, 1, 1);";
+
+        String insert2DataSQL = "INSERT INTO " +
+                "CONNECTIONS(SRC_IP, URI, TIME_STAMP, SEND_B, RECEIVED_B, SPEED) " +
+                "VALUES ('222.22.22.22', '/redirect', 2, 2, 2, 2);";
+
+        String insert3DataSQL = "INSERT INTO " +
+                "CONNECTIONS(SRC_IP, URI, TIME_STAMP, SEND_B, RECEIVED_B, SPEED) " +
+                "VALUES ('222.22.22.22', '/status', 3, 3, 3, 3);";
+
+        stmt.executeUpdate(insert1DataSQL);
+        stmt.executeUpdate(insert2DataSQL);
+        stmt.executeUpdate(insert3DataSQL);
+
+        close(stmt);
+        close(conn);
+    }
+
+    private static ArrayList<Connect> _generateTestData() {
+        return new ArrayList<Connect>(){{
+            add(new Connect(1, "111.11.11.11", "/hello", 1, 1, 1, 1));
+            add(new Connect(2, "222.22.22.22", "/redirect", 2, 2, 2, 2));
+            add(new Connect(3, "222.22.22.22", "/status", 3, 3, 3, 3));
+        }};
     }
 }

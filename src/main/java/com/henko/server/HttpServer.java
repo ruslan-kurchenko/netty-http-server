@@ -14,10 +14,9 @@ import io.netty.handler.logging.LoggingHandler;
 
 import java.io.IOException;
 
-
 public class HttpServer {
 
-    private final static ConfigReader configReader = new ConfigReader("./config/server-config.properties");
+    private final static ConfigReader CONFIG_READER = new ConfigReader("./config/server-config.properties");
 
     public void start() throws Exception {
         DBManager dbManager = new DBManager();
@@ -34,7 +33,7 @@ public class HttpServer {
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ServerInitializer());
 
-            int port = parsePort();
+            int port = _parsePort();
 
             Channel ch = b.bind(port).sync().channel();
 
@@ -48,7 +47,7 @@ public class HttpServer {
         }
     }
 
-    private int parsePort() throws IOException {
-        return Integer.parseInt(configReader.getConfigs().getProperty("server.port"));
+    private int _parsePort() throws IOException {
+        return Integer.parseInt(CONFIG_READER.getConfigs().getProperty("server.port"));
     }
 }

@@ -19,7 +19,7 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
     protected void initChannel(SocketChannel ch) throws Exception {
         ch.pipeline()
                 .addLast(new ServerTrafficHandler(connect))
-                .addLast(new ServerDataBaseCleaner(1000, 16))
+                .addLast(new ServerDataBaseCleaner())
                 .addLast(new ServerConnectionCountHandler())
                 .addLast(new HttpServerCodec())
                 .addLast(new HttpObjectAggregator(512 * 1024))

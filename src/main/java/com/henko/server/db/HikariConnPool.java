@@ -7,24 +7,24 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class HikariConnPool {
-    private static HikariDataSource dataSource;
-    private static HikariConnPool connPool;
+    private static HikariDataSource _dataSource;
+    private static HikariConnPool _connPool;
 
     private final static String CONFIG_PATH = "./config/db-config.properties";
 
     static {
-        connPool = new HikariConnPool();
+        _connPool = new HikariConnPool();
     }
 
     private HikariConnPool() {
         HikariConfig config = new HikariConfig(CONFIG_PATH);
-        dataSource = new HikariDataSource(config);
+        _dataSource = new HikariDataSource(config);
     }
 
     public Connection getConnection(){
         Connection conn = null;
         try {
-            conn = dataSource.getConnection();
+            conn = _dataSource.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -33,6 +33,6 @@ public class HikariConnPool {
     }
 
     public static HikariConnPool getConnPool() {
-        return connPool;
+        return _connPool;
     }
 }

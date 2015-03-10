@@ -56,6 +56,17 @@ public class ServerHttpRequestHandler extends ChannelInboundHandlerAdapter {
         _writeFullHttpResponse(ctx, req, resp);
     }
 
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        ctx.flush();
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
+
     private void _saveConnInfoData(ChannelHandlerContext ctx, HttpRequest req) throws URISyntaxException {
         InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
         String ip = inetSocketAddress.getAddress().getHostAddress();
@@ -107,16 +118,5 @@ public class ServerHttpRequestHandler extends ChannelInboundHandlerAdapter {
             resp.headers().set(CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
             ctx.write(resp);
         }
-    }
-
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.flush();
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
-        ctx.close();
     }
 }
