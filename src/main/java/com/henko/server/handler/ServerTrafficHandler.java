@@ -9,28 +9,28 @@ import static com.henko.server.dao.impl.DaoFactory.*;
 
 public class ServerTrafficHandler extends ChannelTrafficShapingHandler {
 
-    private ConnectDao connInfoDao;
-    private Connect connInfo;
+    private ConnectDao _connectDao;
+    private Connect _connect;
 
-    private double durationMillis;
-    private long receivedBytes;
-    private long sendBytes;
+    private double _durationMillis;
+    private long _receivedBytes;
+    private long _sendBytes;
 
     private ServerTrafficHandler(long checkInterval) {
         super(checkInterval);
     }
 
-    public ServerTrafficHandler(long checkInterval, Connect connInfo) {
+    public ServerTrafficHandler(long checkInterval, Connect _connect) {
         this(checkInterval);
 
-        this.connInfoDao = getDaoFactory(H2).getConnectionDao();
-        this.connInfo = connInfo;
+        this._connectDao = getDaoFactory(H2).getConnectionDao();
+        this._connect = _connect;
     }
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         long startConnTimeStamp = System.currentTimeMillis();
-        connInfo.setTimestamp(startConnTimeStamp);
+        _connect.setTimestamp(startConnTimeStamp);
 
         super.handlerAdded(ctx);
     }
@@ -39,45 +39,40 @@ public class ServerTrafficHandler extends ChannelTrafficShapingHandler {
     public synchronized void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         super.handlerRemoved(ctx);
 
-        saveConnInfoData();
+        _saveConnectData();
     }
 
-    private void saveConnInfoData() {
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+    }
+
+    private void _saveConnectData() {
         long stopConnTimeStamp = System.currentTimeMillis();
-        durationMillis = parseDurationMillis(stopConnTimeStamp);
+        _durationMillis = _parseDurationMillis(stopConnTimeStamp);
 
-        receivedBytes = this.trafficCounter().cumulativeReadBytes();
-        sendBytes = this.trafficCounter().cumulativeWrittenBytes();
-        long speed = parseSpeed();
+        _receivedBytes = this.trafficCounter().cumulativeReadBytes();
+        _sendBytes = this.trafficCounter().cumulativeWrittenBytes();
+        long speed = _parseSpeed();
 
-        connInfo.setReceivedBytes(receivedBytes);
-        connInfo.setSendBytes(sendBytes);
-        connInfo.setSpeed(speed);
+        _connect.setReceivedBytes(_receivedBytes);
+        _connect.setSendBytes(_sendBytes);
+        _connect.setSpeed(speed);
 
-        connInfoDao.insertConnect(connInfo);
-
-//        System.err.println("\nstart - " + connInfo.getTimestamp() + ", end - " + stopConnTimeStamp + ", duration - " + durationMillis);
-//        System.err.println("handler removed: duration: - " + durationMillis + ", received_b - " + receivedBytes +
-//                ", send_b - " + sendBytes +
-//                ", speed - " + speed + "\n");
+        _connectDao.insertConnect(_connect);
     }
 
-    private long parseDurationMillis(long stopConnTimeStamp) {
-        long result = stopConnTimeStamp - connInfo.getTimestamp();
+    private long _parseDurationMillis(long stopConnTimeStamp) {
+        long result = stopConnTimeStamp - _connect.getTimestamp();
 
         if (result == 0) return 1;
 
         return result;
     }
 
-    private long parseSpeed() {
-        double durationSec = durationMillis / 1000.0;
+    private long _parseSpeed() {
+        double durationSec = _durationMillis / 1000.0;
 
-        return (long) ((receivedBytes + sendBytes) / durationSec);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+        return (long) ((_receivedBytes + _sendBytes) / durationSec);
     }
 }

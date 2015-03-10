@@ -56,7 +56,7 @@ public class Controller {
     }
 
     private ByteBuf _processPageHello() throws InterruptedException {
-        //Thread.sleep(10000);
+        Thread.sleep(10000);
 
         return new HelloPage().getContent(CONTENT_CHARSET);
     }
