@@ -9,7 +9,7 @@ public class ServerDataBaseCleaner extends ChannelTrafficShapingHandler {
 
     private final int _leftRows;
 
-    private final static int DEFAULT_LEFT_ROWS = 500;
+    private final static int DEFAULT_LEFT_ROWS = 16;
     private final static int DEFAULT_CLEAN_INTERVAL = 1000;
 
     private final DBManager _dbManager = new DBManager();

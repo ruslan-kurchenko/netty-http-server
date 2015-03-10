@@ -11,7 +11,7 @@ public interface RedirectDao {
 
     public List<Redirect> getAll();
 
-    public List<Redirect> getNRedirect(int howMany);
+    public List<Redirect> getNRedirect(int amount);
 
     public void addOrIncrementCount(String url) throws PersistException;
 }

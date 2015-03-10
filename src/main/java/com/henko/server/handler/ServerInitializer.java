@@ -11,18 +11,18 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
 
 
-public class ServerInitializer extends ChannelInitializer<SocketChannel>{
+public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private final Connect connect = new Connect();
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
-        ChannelPipeline p = ch.pipeline();
-        p.addLast(new ServerTrafficHandler(0, connect));
-        p.addLast(new ServerDataBaseCleaner());
-        p.addLast(new ServerConnectionCountHandler(0));
-        p.addLast(new HttpServerCodec());
-        p.addLast(new HttpObjectAggregator(512 * 1024));
-        p.addLast(new ServerHttpRequestHandler(connect));
+        ch.pipeline()
+                .addLast(new ServerTrafficHandler(connect))
+                .addLast(new ServerDataBaseCleaner(1000, 16))
+                .addLast(new ServerConnectionCountHandler())
+                .addLast(new HttpServerCodec())
+                .addLast(new HttpObjectAggregator(512 * 1024))
+                .addLast(new ServerHttpRequestHandler(connect));
     }
 }

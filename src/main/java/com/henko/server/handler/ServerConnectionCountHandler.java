@@ -10,11 +10,18 @@ import static io.netty.channel.ChannelHandler.*;
 @Sharable
 public class ServerConnectionCountHandler extends ChannelTrafficShapingHandler {
 
+    /** Don`t execute doAccounting() method **/
+    private static final int CHECK_INTERVAL = 0;
+
     private static final AtomicInteger CURRENT_CONNECTION_COUNT = new AtomicInteger();
     private static final AtomicInteger ALL_CONNECTION_COUNT = new AtomicInteger();
 
-    public ServerConnectionCountHandler(long checkInterval) {
+    private ServerConnectionCountHandler(long checkInterval) {
         super(checkInterval);
+    }
+
+    public ServerConnectionCountHandler() {
+        this(CHECK_INTERVAL);
     }
 
 

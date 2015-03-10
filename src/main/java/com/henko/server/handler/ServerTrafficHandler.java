@@ -9,6 +9,9 @@ import static com.henko.server.dao.impl.DaoFactory.*;
 
 public class ServerTrafficHandler extends ChannelTrafficShapingHandler {
 
+    /** Don`t execute doAccounting() method **/
+    private static final int CHECK_INTERVAL = 0;
+
     private ConnectDao _connectDao;
     private Connect _connect;
 
@@ -20,8 +23,8 @@ public class ServerTrafficHandler extends ChannelTrafficShapingHandler {
         super(checkInterval);
     }
 
-    public ServerTrafficHandler(long checkInterval, Connect _connect) {
-        this(checkInterval);
+    public ServerTrafficHandler(Connect _connect) {
+        this(CHECK_INTERVAL);
 
         this._connectDao = getDaoFactory(H2).getConnectionDao();
         this._connect = _connect;
