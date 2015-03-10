@@ -5,12 +5,15 @@ import io.netty.handler.traffic.ChannelTrafficShapingHandler;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class NumberConnectionHandler extends ChannelTrafficShapingHandler {
+import static io.netty.channel.ChannelHandler.*;
+
+@Sharable
+public class ServerConnectionCountHandler extends ChannelTrafficShapingHandler {
 
     private static final AtomicInteger CURRENT_CONNECTION_COUNT = new AtomicInteger();
     private static final AtomicInteger ALL_CONNECTION_COUNT = new AtomicInteger();
 
-    public NumberConnectionHandler(long checkInterval) {
+    public ServerConnectionCountHandler(long checkInterval) {
         super(checkInterval);
     }
 

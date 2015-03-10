@@ -3,7 +3,7 @@ package com.henko.server.dao.impl;
 import com.henko.server.dao.ConnectDao;
 import com.henko.server.db.HikariConnPool;
 import com.henko.server.domain.UniqueRequest;
-import com.henko.server.handler.NumberConnectionHandler;
+import com.henko.server.handler.ServerConnectionCountHandler;
 import com.henko.server.model.Connect;
 
 import java.sql.*;
@@ -72,13 +72,15 @@ public class H2ConnectDao implements ConnectDao {
 
     @Override
     public List<Connect> getLastNConn(int amount) {
-        String selectStr = "SELECT * \n" +
+        String selectStr = "" +
+                "SELECT * " +
                 "FROM (" +
-                "       SELECT * " +
+                "       SELECT TOP(?) * " +
                 "       FROM CONNECTIONS " +
-                "       ORDER BY ID_CONNECTION DESC LIMIT ?" +
+                "       ORDER BY ID_CONNECTION DESC" +
                 "     ) AS tbl " +
                 "ORDER BY tbl.ID_CONNECTION ASC;";
+
 
         Connection conn = _pool.getConnection();
         PreparedStatement stmt = null;
@@ -130,7 +132,7 @@ public class H2ConnectDao implements ConnectDao {
 
     @Override
     public int getNumOfAllConn() {
-        return NumberConnectionHandler.getAllConnCount();
+        return ServerConnectionCountHandler.getAllConnCount();
     }
 
     @Override
@@ -160,7 +162,7 @@ public class H2ConnectDao implements ConnectDao {
 
     @Override
     public int getNumOfCurrentConn() {
-        return NumberConnectionHandler.getConnectionCount();
+        return ServerConnectionCountHandler.getConnectionCount();
     }
 
     @Override

@@ -5,33 +5,33 @@ import com.henko.server.db.DBManager;
 import io.netty.handler.traffic.ChannelTrafficShapingHandler;
 import io.netty.handler.traffic.TrafficCounter;
 
-public class HttpDataBaseCleaner extends ChannelTrafficShapingHandler {
+public class ServerDataBaseCleaner extends ChannelTrafficShapingHandler {
 
     private final int _leftRows;
 
     private final static int DEFAULT_LEFT_ROWS = 500;
     private final static int DEFAULT_CLEAN_INTERVAL = 1000;
 
-    private final DBManager dbManager = new DBManager();
+    private final DBManager _dbManager = new DBManager();
 
-    public HttpDataBaseCleaner() {
+    public ServerDataBaseCleaner() {
         super(DEFAULT_CLEAN_INTERVAL);
         this._leftRows = DEFAULT_LEFT_ROWS;
     }
 
-    public HttpDataBaseCleaner(long cleanInterval) {
+    public ServerDataBaseCleaner(long cleanInterval) {
         super(cleanInterval);
         this._leftRows = DEFAULT_LEFT_ROWS;
     }
 
-    public HttpDataBaseCleaner(long cleanInterval, int leftRows) {
+    public ServerDataBaseCleaner(long cleanInterval, int leftRows) {
         super(cleanInterval);
         this._leftRows = leftRows;
     }
 
     @Override
     protected void doAccounting(TrafficCounter counter) {
-        dbManager.cleanConnectionInfoTable(_leftRows);
+        _dbManager.cleanConnectionInfoTable(_leftRows);
 
         super.doAccounting(counter);
     }

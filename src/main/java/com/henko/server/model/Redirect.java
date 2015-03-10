@@ -20,10 +20,6 @@ public class Redirect implements Serializable {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getUrl() {
         return url;
     }
@@ -34,10 +30,6 @@ public class Redirect implements Serializable {
 
     public int getCount() {
         return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
     }
 
     @Override

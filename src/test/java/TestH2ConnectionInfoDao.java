@@ -100,36 +100,10 @@ public class TestH2ConnectionInfoDao {
         assertEquals(expected, actual);
     }
 
-//    @Test
-//    public void testSelectByTimeStamp() {
-//        long timestamp =  0;
-//        ConnectionInfo expected = null;
-//        for (int i = 0; i < 100; i++) {
-//            timestamp = System.currentTimeMillis();
-//            expected = new ConnectionInfo("111.11.11.11", "/hello", timestamp, 100, 100, 200);
-//
-//            dao.insertConnect(expected);
-//
-//            System.out.println(dao.selectByTimeStamp(timestamp));
-//        }
-//        expected.setId(103);
-//        ConnectionInfo actual = dao.selectByTimeStamp(timestamp);
-//
-//        assertEquals(expected, actual);
-//    }
-
     @Test
     public void testSelectNumberOfUniqueRequest() {
         int expected = 2;
         int actual = dao.getNumOfUniqueConn();
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void testSelectNumberOfAllRequests(){
-        int expected = 3;
-        int actual = dao.getNumOfAllConn();
 
         assertEquals(expected, actual);
     }

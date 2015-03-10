@@ -25,12 +25,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
-public class HttpMVCHandler extends ChannelInboundHandlerAdapter {
+public class ServerHttpRequestHandler extends ChannelInboundHandlerAdapter {
 
     private final Connect _connInfo;
     private final Controller _controller = new Controller();
 
-    public HttpMVCHandler(Connect connInfo) {
+    public ServerHttpRequestHandler(Connect connInfo) {
         this._connInfo = connInfo;
     }
 

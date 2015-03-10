@@ -38,14 +38,6 @@ public class Connect implements Serializable {
         this.speed = speed;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getIp() {
         return ip;
     }

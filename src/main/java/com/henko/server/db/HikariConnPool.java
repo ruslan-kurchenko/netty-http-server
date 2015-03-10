@@ -7,10 +7,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class HikariConnPool {
-    private static HikariDataSource dataSource = null;
+    private static HikariDataSource dataSource;
     private static HikariConnPool connPool;
 
-    private final static String CONFIG_PATH = "./src/main/resources/config.properties";
+    private final static String CONFIG_PATH = "./config/db-config.properties";
 
     static {
         connPool = new HikariConnPool();
@@ -19,7 +19,6 @@ public class HikariConnPool {
     private HikariConnPool() {
         HikariConfig config = new HikariConfig(CONFIG_PATH);
         dataSource = new HikariDataSource(config);
-        dataSource.setMaximumPoolSize(100);
     }
 
     public Connection getConnection(){
