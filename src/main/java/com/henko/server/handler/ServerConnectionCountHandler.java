@@ -1,10 +1,9 @@
 package com.henko.server.handler;
 
-import com.henko.server.dao.UniqueReqDao;
-import com.henko.server.dao.impl.DaoFactory;
 import com.henko.server.model.UniqueReq;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.traffic.ChannelTrafficShapingHandler;
+import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.henko.server.dao.impl.DaoFactory.*;
 import static io.netty.channel.ChannelHandler.*;
 
 @Sharable
@@ -37,8 +35,7 @@ public class ServerConnectionCountHandler extends ChannelTrafficShapingHandler {
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-        InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
-        String ip = inetSocketAddress.getAddress().getHostAddress();
+        String ip = _parseIp(ctx);
         long connTime = System.currentTimeMillis();
 
         CURRENT_CONNECTION_COUNT.incrementAndGet();
@@ -58,10 +55,10 @@ public class ServerConnectionCountHandler extends ChannelTrafficShapingHandler {
         return CURRENT_CONNECTION_COUNT.get();
     }
 
-    public static int getCountOfAllReq() {
+    public synchronized static int getCountOfAllReq() {
         int count = 0;
         for (UniqueReq req : UNIQUE_REQUESTS.values()) {
-            count = count + req.getCount();
+            count += req.getCount();
         }
 
         return count;
@@ -86,9 +83,7 @@ public class ServerConnectionCountHandler extends ChannelTrafficShapingHandler {
 
         if (UNIQUE_REQUESTS.containsKey(ip)) {
             int count = _getCountByIp(ip);
-
-            UNIQUE_REQUESTS.remove(ip);
-            UNIQUE_REQUESTS.put(ip, new UniqueReq(ip, count + 1, lastConn));
+            UNIQUE_REQUESTS.put(ip, new UniqueReq(ip, ++count, lastConn));
         } else {
             UNIQUE_REQUESTS.put(ip, new UniqueReq(ip, 1, lastConn));
         }
@@ -96,5 +91,10 @@ public class ServerConnectionCountHandler extends ChannelTrafficShapingHandler {
 
     private int _getCountByIp(String ip) {
         return UNIQUE_REQUESTS.get(ip).getCount();
+    }
+
+    private String _parseIp(ChannelHandlerContext ctx) {
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+        return inetSocketAddress.getAddress().getHostAddress();
     }
 }

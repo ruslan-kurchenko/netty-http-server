@@ -82,11 +82,11 @@ public class Controller {
 
         List<Redirect> redirectList = redirectDao.getNRedirect(REDIRECT_AMOUNT);
 
-        int uniqueRequest = uniqueReqDao.getNumOfUniqueReq();
+        int uniqueRequests = uniqueReqDao.getNumOfUniqueReq();
         int requests = uniqueReqDao.getNumOfAllReq();
         List<UniqueReq> uniqueReqList = uniqueReqDao.getNUniqueReq(UNIQUE_REQ_AMOUNT);
 
-        return new ServerStatus(requests, uniqueRequest, currentConn, uniqueReqList, connList, redirectList);
+        return new ServerStatus(requests, uniqueRequests, currentConn, uniqueReqList, connList, redirectList);
     }
 
     private boolean _validateParameters(Map<String, List<String>> parameters) {
