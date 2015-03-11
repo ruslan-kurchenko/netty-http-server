@@ -73,7 +73,7 @@ connection and stores all data in the database using [H2ConnectDao](https://gith
 > This handler has only one public constructor without and arguments. By default inner variable `CHECK_INTERVAL = 0`, it's mean
 that handler doesn't call with `doAccounting()` method.
 
-##### Additional
+####Additional
 **The Server has two branches:**
 
 - `master` - implementation totally based on data base, so we can't get all unique requests via saving all connections to data 
