@@ -135,6 +135,11 @@ public class H2ConnectDao implements ConnectDao {
         }
     }
 
+    @Override
+    public int getNumOfAllConn() {
+        return ServerConnectionCountHandler.getCountOfAllReq();
+    }
+
     /**************************************
      * Inner helper methods:
      *************************************/

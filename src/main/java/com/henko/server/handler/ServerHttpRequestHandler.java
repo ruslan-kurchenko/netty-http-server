@@ -31,12 +31,10 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class ServerHttpRequestHandler extends ChannelInboundHandlerAdapter {
 
     private final Connect _connInfo;
-    private final UniqueReq _uniqueReq;
     private final Controller _controller = new Controller();
 
-    public ServerHttpRequestHandler(Connect connInfo, UniqueReq uniqueReq) {
+    public ServerHttpRequestHandler(Connect connInfo) {
         this._connInfo = connInfo;
-        this._uniqueReq = uniqueReq;
     }
 
     @Override
@@ -80,7 +78,6 @@ public class ServerHttpRequestHandler extends ChannelInboundHandlerAdapter {
 
         _connInfo.setIp(ip);
         _connInfo.setUri(uri);
-        _uniqueReq.setIp(ip);
     }
 
     private void _write100ContinueResponse(ChannelHandlerContext ctx) {

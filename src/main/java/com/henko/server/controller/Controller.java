@@ -82,8 +82,8 @@ public class Controller {
 
         List<Redirect> redirectList = redirectDao.getNRedirect(REDIRECT_AMOUNT);
 
-        int uniqueRequest = uniqueReqDao.getNumOfUniqueConn();
-        int requests = uniqueReqDao.getNumOfAllConn();
+        int uniqueRequest = uniqueReqDao.getNumOfUniqueReq();
+        int requests = uniqueReqDao.getNumOfAllReq();
         List<UniqueReq> uniqueReqList = uniqueReqDao.getNUniqueReq(UNIQUE_REQ_AMOUNT);
 
         return new ServerStatus(requests, uniqueRequest, currentConn, uniqueReqList, connList, redirectList);

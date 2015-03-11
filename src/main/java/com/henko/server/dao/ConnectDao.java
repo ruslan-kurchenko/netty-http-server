@@ -16,4 +16,6 @@ public interface ConnectDao {
     public int getNumOfCurrentConn();
 
     public void insertConnect(Connect connect);
+
+    public int getNumOfAllConn();
 }
