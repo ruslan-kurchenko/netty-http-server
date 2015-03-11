@@ -15,7 +15,7 @@ store information about them in the data base.
 - [`HttpObjectAggregator`](http://netty.io/4.0/api/io/netty/handler/codec/http/HttpObjectAggregator.html) - provides handle only full HTTP messages and be okay with some memory overhead.
 - [`HttpServerCodec`](http://netty.io/4.0/api/io/netty/handler/codec/http/HttpServerCodec.html) - provides decode HTTP requests from clients/decode HTTP response for clients. 
 
-##### `ServerHttpRequestHandler` - provides four situations "how are requests processed?":
+#### `ServerHttpRequestHandler` - provides four situations "how are requests processed?":
 - `http://localhost:{port}/hello` server wait 10 second and that sends response with HTML page which contains "Hello World" string.
 - `http://localhost:{port}/redirect?url=<url>` server redirect client to specified `<url>`.
 - `http://localhost:{port}/status` server sends response with HTML page which contains server status.
@@ -37,21 +37,21 @@ and table with information about last connections(by default table have 3, 3, 16
 Also if the path is `/redirect?url=<url>`, the controller can
 prepare a `<url>` for handler. All responses sends the handler.
 
-##### `ServerConnectionCountHandler` - concurrent count of connections
+#### `ServerConnectionCountHandler` - concurrent count of connections
 The counter based on [ChannelTrafficShapingHandler](http://netty.io/4.0/api/io/netty/handler/traffic/ChannelTrafficShapingHandler.html).
 It is has two [AtomicInteger](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/atomic/AtomicInteger.html)
 variables: `CURRENT_CONNECTION_COUNT` and `ALL_CONNECTION_COUNT` which count current connections and 
 all connections to server corresponds. Also handler provides two methods that provides getting numbers from this 
 inner counters.
 > This handler has only one public constructor without and arguments. By default inner variable `CHECK_INTERVAL = 0`, it's mean 
-that handler doesn't work with `doAccounting()` method. 
+that handler doesn't call with `doAccounting()` method. 
  
 
-##### `ServerDataBaseCleaner` - very important handler "why"?
+#### `ServerDataBaseCleaner` - very important handler "why"?
 This handler provides database cleaning. It is the child of [ChannelTrafficShapingHandler](http://netty.io/4.0/api/io/netty/handler/traffic/ChannelTrafficShapingHandler.html). 
 When a method `doAccounting(...)` works, inner [DBManager](https://github.com/henko-okdev/netty-http-server/blob/master/src/main/java/com/henko/server/db/DBManager.java) 
 cleans storage. Also you can configure cleaning interval(`cleanInterval`) and how many rows a cleaner left in table(`leftRows`) 
-via handler constructor. By default `cleanInterval = 1000 milliseconds`, `leftRows = 500`.
+via handler constructor. By default `cleanInterval = 1000 milliseconds`, `leftRows = 16`.
 
 
 #####A little bit about server storage
@@ -67,13 +67,13 @@ and RedirectDao implementations of which provide communication with DB([H2Connec
 >Each time before the server start, [DBManager](https://github.com/henko-okdev/netty-http-server/blob/master/src/main/java/com/henko/server/db/DBManager.java)
 prepares the database.
 
-##### `ServerTrafficHandler` - count server I/O data
-This counter specialized on counting received and sent data by server. Also handler calculates the speed of each
+#### `ServerTrafficHandler` - count server I/O data
+This counter specialized on counting received and sent data by server. Also handler calculates the speed of each 
 connection and stores all data in the database using [H2ConnectDao](https://github.com/henko-okdev/netty-http-server/blob/master/src/main/java/com/henko/server/dao/impl/H2ConnectDao.java). 
 > This handler has only one public constructor without and arguments. By default inner variable `CHECK_INTERVAL = 0`, it's mean
-that handler doesn't work with `doAccounting()` method.
+that handler doesn't call with `doAccounting()` method.
 
-##### Additional
+####Additional
 **The Server has two branches:**
 
 - `master` - implementation totally based on data base, so we can't get all unique requests via saving all connections to data 
