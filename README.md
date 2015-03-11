@@ -82,6 +82,7 @@ ofc. it's it my implementation, and ofc. it's not best way.
 - `unique-request-dao` - in this case I implemented count number of unique request via [`ConcurrentHashMap`](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentHashMap.html) 
 and now we have more accuracy. To do that I changed `ServerConnectionCountHandler` and create new DAO - [`UniqueReqDao`](https://github.com/henko-okdev/netty-http-server/blob/unquie-req-dao/src/main/java/com/henko/server/dao/UniqueReqDao.java) 
 for more flexibility.
+
 >In folder [`~/screenshots`](https://github.com/henko-okdev/netty-http-server/tree/master/screenshots) 
 you can find results of server test for two cases which was considered above.
 
