@@ -3,6 +3,7 @@ package com.henko.server.dao.impl;
 
 import com.henko.server.dao.ConnectDao;
 import com.henko.server.dao.RedirectDao;
+import com.henko.server.dao.UniqueReqDao;
 
 public abstract class DaoFactory {
     
@@ -10,6 +11,7 @@ public abstract class DaoFactory {
     
     public abstract ConnectDao getConnectionDao();
     public abstract RedirectDao getRedirectDao();
+    public abstract UniqueReqDao getUniqueReqDao();
     
     public static DaoFactory getDaoFactory(String type) {
         switch (type) {

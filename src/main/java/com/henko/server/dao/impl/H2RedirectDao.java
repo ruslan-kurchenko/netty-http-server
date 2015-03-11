@@ -21,7 +21,7 @@ public class H2RedirectDao implements RedirectDao {
 
     @Override
     public Redirect getByUrl(String url) {
-        Redirect info = null;
+        Redirect redirect = null;
         String selectStr = "SELECT * FROM REDIRECTS WHERE URL = ?;";
 
         Connection conn = _pool.getConnection();
@@ -41,7 +41,7 @@ public class H2RedirectDao implements RedirectDao {
 
             if (_redirectNotFound(id)) return null;
 
-            info = new Redirect(id, url, count);
+            redirect = new Redirect(id, url, count);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -50,7 +50,7 @@ public class H2RedirectDao implements RedirectDao {
             close(conn);
         }
 
-        return info;
+        return redirect;
     }
 
     @Override
@@ -113,14 +113,14 @@ public class H2RedirectDao implements RedirectDao {
     @Override
     public void addOrIncrementCount(String url) throws PersistException {
         if (getByUrl(url) == null) {
-            if (_insertRedirectInfo(url) == 0) throw new PersistException();
+            if (_insertRedirect(url) == 0) throw new PersistException();
             return;
         }
 
         if (!_increaseCountByUrl(url)) throw new PersistException();
     }
 
-    private int _insertRedirectInfo(String url) {
+    private int _insertRedirect(String url) {
         String insertStr = "INSERT INTO REDIRECTS (URL, R_COUNT) VALUES(?, 1);";
 
         Connection conn = _pool.getConnection();

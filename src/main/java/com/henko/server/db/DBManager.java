@@ -15,8 +15,9 @@ public class DBManager {
     public void initialiseDB() {
         Connection conn = _pool.getConnection();
         try {
-            _createConnectionInfoTable(conn);
-            _createRedirectInfoTable(conn);
+            _createConnectsTable(conn);
+            _createRedirectsTable(conn);
+            _createUniqueReqTable(conn);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -27,6 +28,7 @@ public class DBManager {
     public void dropTables() {
         String dropRedirectsStr = "DROP TABLE IF EXISTS REDIRECTS;";
         String dropConnectionsStr = "DROP TABLE IF EXISTS CONNECTIONS;";
+        String dropUniqueReqStr = "DROP TABLE IF EXISTS UNIQUE_REQUESTS;";
 
         Connection conn = _pool.getConnection();
         Statement stmt = null;
@@ -34,6 +36,7 @@ public class DBManager {
             stmt = conn.createStatement();
             stmt.executeUpdate(dropConnectionsStr);
             stmt.executeUpdate(dropRedirectsStr);
+            stmt.executeUpdate(dropUniqueReqStr);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -90,7 +93,7 @@ public class DBManager {
         return rs.getInt(1);
     }
 
-    private void _createConnectionInfoTable(Connection conn) throws SQLException {
+    private void _createConnectsTable(Connection conn) throws SQLException {
         String createTableSQL = "" +
                 "CREATE TABLE IF NOT EXISTS CONNECTIONS( " +
                 "ID_CONNECTION INT PRIMARY KEY AUTO_INCREMENT, " +
@@ -104,12 +107,23 @@ public class DBManager {
         _createTable(conn, createTableSQL);
     }
 
-    private void _createRedirectInfoTable(Connection conn) throws SQLException {
+    private void _createRedirectsTable(Connection conn) throws SQLException {
         String createTableSQL = "" +
                 "CREATE TABLE IF NOT EXISTS REDIRECTS(" +
                 "ID_REDIRECT INT PRIMARY KEY AUTO_INCREMENT, " +
                 "URL VARCHAR(45) NOT NULL, " +
                 "R_COUNT INT NOT NULL);";
+
+        _createTable(conn, createTableSQL);
+    }
+
+    private void _createUniqueReqTable(Connection conn) throws SQLException {
+        String createTableSQL = "" +
+                "CREATE TABLE IF NOT EXISTS UNIQUE_REQUESTS(" +
+                "ID INT PRIMARY KEY AUTO_INCREMENT NOT NULL, " +
+                "IP VARCHAR(45) NOT NULL, " +
+                "COUNT INT NOT NULL, " +
+                "LAST_CONN DECIMAL NOT NULL);";
 
         _createTable(conn, createTableSQL);
     }

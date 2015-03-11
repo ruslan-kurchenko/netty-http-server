@@ -2,7 +2,7 @@ package com.henko.server.dao.impl;
 
 import com.henko.server.dao.ConnectDao;
 import com.henko.server.db.HikariConnPool;
-import com.henko.server.domain.UniqueRequest;
+import com.henko.server.model.UniqueReq;
 import com.henko.server.handler.ServerConnectionCountHandler;
 import com.henko.server.model.Connect;
 
@@ -105,7 +105,7 @@ public class H2ConnectDao implements ConnectDao {
     }
 
     @Override
-    public List<UniqueRequest> getNUniqueRequest(int amount) {
+    public List<UniqueReq> getNUniqueRequest(int amount) {
         String selectStr = "SELECT SRC_IP, COUNT(SRC_IP), MAX(TIME_STAMP) FROM CONNECTIONS GROUP BY SRC_IP LIMIT ?;";
 
         Connection conn = _pool.getConnection();
@@ -227,14 +227,14 @@ public class H2ConnectDao implements ConnectDao {
         return infoList;
     }
 
-    private List<UniqueRequest> _parseUniqueRequestList(ResultSet rs) throws SQLException {
-        List<UniqueRequest> requestInfoList = new ArrayList<>();
+    private List<UniqueReq> _parseUniqueRequestList(ResultSet rs) throws SQLException {
+        List<UniqueReq> requestInfoList = new ArrayList<>();
         do {
             String ip = rs.getString(1);
             int count = rs.getInt(2);
             long lastConn = rs.getLong(3);
 
-            requestInfoList.add(new UniqueRequest(ip, count, lastConn));
+            requestInfoList.add(new UniqueReq(ip, count, lastConn));
         } while (rs.next());
 
         return requestInfoList;

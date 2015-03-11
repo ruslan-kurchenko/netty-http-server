@@ -14,4 +14,5 @@ public interface RedirectDao {
     public List<Redirect> getNRedirect(int amount);
 
     public void addOrIncrementCount(String url) throws PersistException;
+
 }

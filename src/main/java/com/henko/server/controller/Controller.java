@@ -4,7 +4,7 @@ import com.henko.server.dao.ConnectDao;
 import com.henko.server.dao.RedirectDao;
 import com.henko.server.dao.impl.DaoFactory;
 import com.henko.server.domain.ServerStatus;
-import com.henko.server.domain.UniqueRequest;
+import com.henko.server.model.UniqueReq;
 import com.henko.server.model.Connect;
 import com.henko.server.model.Redirect;
 import com.henko.server.view.ErrorPage;
@@ -76,13 +76,13 @@ public class Controller {
         RedirectDao redirectDao = _daoFactory.getRedirectDao();
 
         List<Connect> connList = connDao.getLastNConn(CONNECT_AMOUNT);
-        List<UniqueRequest> uniqueRequestList = connDao.getNUniqueRequest(UNIQUE_REQ_AMOUNT);
+        List<UniqueReq> uniqueReqList = connDao.getNUniqueRequest(UNIQUE_REQ_AMOUNT);
         int requests = connDao.getNumOfAllConn();
         int uniqueRequest = connDao.getNumOfUniqueConn();
         int currentConn = connDao.getNumOfCurrentConn();
         List<Redirect> redirectList = redirectDao.getNRedirect(REDIRECT_AMOUNT);
 
-        return new ServerStatus(requests, uniqueRequest, currentConn, uniqueRequestList, connList, redirectList);
+        return new ServerStatus(requests, uniqueRequest, currentConn, uniqueReqList, connList, redirectList);
     }
 
     private boolean _validateParameters(Map<String, List<String>> parameters) {

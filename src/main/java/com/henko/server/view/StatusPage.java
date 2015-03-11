@@ -1,7 +1,7 @@
 package com.henko.server.view;
 
 import com.henko.server.domain.ServerStatus;
-import com.henko.server.domain.UniqueRequest;
+import com.henko.server.model.UniqueReq;
 import com.henko.server.model.Connect;
 import com.henko.server.model.Redirect;
 import io.netty.buffer.ByteBuf;
@@ -115,11 +115,11 @@ public class StatusPage implements Page {
 
     private String _getContentOfUniqueRequestsTable() {
         String data = "";
-        List<UniqueRequest> list = _status.getUniqueRequestList();
+        List<UniqueReq> list = _status.getUniqueReqList();
 
         if (list == null) return _getEmptyTableColumns(3);
 
-        for (UniqueRequest request : list) {
+        for (UniqueReq request : list) {
             data += "<tr>\n" +
                     "   <td>" + request.getIp() + "</td>\n" +
                     "   <td>" + request.getCount() + "</td>\n" +

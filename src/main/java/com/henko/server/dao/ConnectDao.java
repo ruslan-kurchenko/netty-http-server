@@ -1,6 +1,6 @@
 package com.henko.server.dao;
 
-import com.henko.server.domain.UniqueRequest;
+import com.henko.server.model.UniqueReq;
 import com.henko.server.model.Connect;
 
 import java.util.List;
@@ -13,7 +13,7 @@ public interface ConnectDao {
 
     public List<Connect> getLastNConn(int amount);
 
-    public List<UniqueRequest> getNUniqueRequest(int amount);
+    public List<UniqueReq> getNUniqueRequest(int amount);
 
     public int getNumOfUniqueConn();
 

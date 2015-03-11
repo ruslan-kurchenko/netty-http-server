@@ -1,20 +1,36 @@
-package com.henko.server.domain;
+package com.henko.server.model;
 
-import java.util.Date;
 
-public class UniqueRequest {
+public class UniqueReq {
+    private int id;
     private String ip;
     private int count;
     private long lastConn;
 
-    public UniqueRequest() {
+    public UniqueReq() {
         
     }
 
-    public UniqueRequest(String ip, int count, long lastConn) {
+    public UniqueReq(String ip, long lastConn) {
+        this.ip = ip;
+        this.lastConn = lastConn;
+    }
+
+    public UniqueReq(String ip, int count, long lastConn) {
         this.ip = ip;
         this.count = count;
         this.lastConn = lastConn;
+    }
+
+    public UniqueReq(int id, String ip, int count, long lastConn) {
+        this.id = id;
+        this.ip = ip;
+        this.count = count;
+        this.lastConn = lastConn;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getIp() {
@@ -46,18 +62,20 @@ public class UniqueRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UniqueRequest that = (UniqueRequest) o;
+        UniqueReq uniqueReq = (UniqueReq) o;
 
-        if (count != that.count) return false;
-        if (lastConn != that.lastConn) return false;
-        if (ip != null ? !ip.equals(that.ip) : that.ip != null) return false;
+        if (count != uniqueReq.count) return false;
+        if (id != uniqueReq.id) return false;
+        if (lastConn != uniqueReq.lastConn) return false;
+        if (ip != null ? !ip.equals(uniqueReq.ip) : uniqueReq.ip != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = ip != null ? ip.hashCode() : 0;
+        int result = id;
+        result = 31 * result + (ip != null ? ip.hashCode() : 0);
         result = 31 * result + count;
         result = 31 * result + (int) (lastConn ^ (lastConn >>> 32));
         return result;
@@ -65,10 +83,11 @@ public class UniqueRequest {
 
     @Override
     public String toString() {
-        return "UniqueRequest{" +
-                "ip='" + ip + '\'' +
+        return "UniqueReq{" +
+                "id=" + id +
+                ", ip='" + ip + '\'' +
                 ", count=" + count +
-                ", lastConn=" + new Date(lastConn) +
+                ", lastConn=" + lastConn +
                 '}';
     }
 }

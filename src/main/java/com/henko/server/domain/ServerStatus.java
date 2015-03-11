@@ -2,6 +2,7 @@ package com.henko.server.domain;
 
 import com.henko.server.model.Connect;
 import com.henko.server.model.Redirect;
+import com.henko.server.model.UniqueReq;
 
 import java.util.List;
 
@@ -9,7 +10,7 @@ public class ServerStatus {
     private int numOfAllRequests;
     private int numOfUniqueRequests;
     private int numOfCurrentConn;
-    private List<UniqueRequest> uniqueRequestList;
+    private List<UniqueReq> uniqueReqList;
     private List<Connect> connectList;
     private List<Redirect> redirectList;
 
@@ -19,13 +20,13 @@ public class ServerStatus {
     public ServerStatus(int numOfAllRequests,
                         int numOfUniqueRequests,
                         int numOfCurrentConn,
-                        List<UniqueRequest> uniqueRequestList,
+                        List<UniqueReq> uniqueReqList,
                         List<Connect> connectList,
                         List<Redirect> redirectList) {
         this.numOfAllRequests = numOfAllRequests;
         this.numOfUniqueRequests = numOfUniqueRequests;
         this.numOfCurrentConn = numOfCurrentConn;
-        this.uniqueRequestList = uniqueRequestList;
+        this.uniqueReqList = uniqueReqList;
         this.connectList = connectList;
         this.redirectList = redirectList;
     }
@@ -54,12 +55,12 @@ public class ServerStatus {
         this.numOfCurrentConn = numOfCurrentConn;
     }
 
-    public List<UniqueRequest> getUniqueRequestList() {
-        return uniqueRequestList;
+    public List<UniqueReq> getUniqueReqList() {
+        return uniqueReqList;
     }
 
-    public void setUniqueRequestList(List<UniqueRequest> uniqueRequestList) {
-        this.uniqueRequestList = uniqueRequestList;
+    public void setUniqueReqList(List<UniqueReq> uniqueReqList) {
+        this.uniqueReqList = uniqueReqList;
     }
 
     public List<Connect> getConnectList() {
