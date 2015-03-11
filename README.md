@@ -43,6 +43,8 @@ It is has two [AtomicInteger](http://docs.oracle.com/javase/7/docs/api/java/util
 variables: `CURRENT_CONNECTION_COUNT` and `ALL_CONNECTION_COUNT` which count current connections and 
 all connections to server corresponds. Also handler provides two methods that provides getting numbers from this 
 inner counters.
+> This handler has only one public constructor without and arguments. By default inner variable `CHECK_INTERVAL = 0`, it's mean 
+that handler doesn't work with `doAccounting()` method. 
  
 
 ##### `ServerDataBaseCleaner` - very important handler "why"?
@@ -50,6 +52,7 @@ This handler provides database cleaning. It is the child of [ChannelTrafficShapi
 When a method `doAccounting(...)` works, inner [DBManager](https://github.com/henko-okdev/netty-http-server/blob/master/src/main/java/com/henko/server/db/DBManager.java) 
 cleans storage. Also you can configure cleaning interval(`cleanInterval`) and how many rows a cleaner left in table(`leftRows`) 
 via handler constructor. By default `cleanInterval = 1000 milliseconds`, `leftRows = 500`.
+
 
 #####A little bit about server storage
 The server uses **[H2DataBase](http://www.h2database.com/)** 
@@ -65,12 +68,22 @@ and RedirectDao implementations of which provide communication with DB([H2Connec
 prepares the database.
 
 ##### `ServerTrafficHandler` - count server I/O data
-This counter specialized on counting received and sent data by server. Also processor calculates the speed of each 
+This counter specialized on counting received and sent data by server. Also handler calculates the speed of each 
 connection and stores all data in the database using [H2ConnectDao](https://github.com/henko-okdev/netty-http-server/blob/master/src/main/java/com/henko/server/dao/impl/H2ConnectDao.java). 
-
+> This handler has only one public constructor without and arguments. By default inner variable `CHECK_INTERVAL = 0`, it's mean
+that handler doesn't work with `doAccounting()` method.
 
 ##### Additional
-Also server has some classes helpers:
+**The Server has two branches:**
+
+- `master` - implementation totally based on data base, so we can't get all unique requests via saving all connections to data 
+base, after a little bit time server will start work very slowly. But in this case we can get all number of connections correctly, 
+ofc. it's it my implementation, and ofc. it's not best way.
+- `unique-request-dao` - in this case I implemented count number of unique request via [`ConcurrentHashMap`](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentHashMap.html) 
+and now we have more accuracy. To do that I changed `ServerConnectionCountHandler` and create new DAO - [`UniqueReqDao`](https://github.com/henko-okdev/netty-http-server/blob/unquie-req-dao/src/main/java/com/henko/server/dao/UniqueReqDao.java) 
+for more flexibility.
+
+**Also server has some classes helpers:**
 
 - [ConfigReader](https://github.com/henko-okdev/netty-http-server/blob/master/src/main/java/com/henko/server/util/ConfigReader.java) - 
 provides reading `.properties` configurations files.
