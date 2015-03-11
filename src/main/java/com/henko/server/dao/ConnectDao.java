@@ -13,13 +13,7 @@ public interface ConnectDao {
 
     public List<Connect> getLastNConn(int amount);
 
-    public List<UniqueReq> getNUniqueRequest(int amount);
-
-    public int getNumOfUniqueConn();
-
     public int getNumOfCurrentConn();
-
-    public int getNumOfAllConn();
 
     public void insertConnect(Connect connect);
 }

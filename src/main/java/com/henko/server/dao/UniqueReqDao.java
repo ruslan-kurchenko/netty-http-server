@@ -11,4 +11,8 @@ public interface UniqueReqDao {
     public void addOrIncrementCount(UniqueReq request);
 
     public List<UniqueReq> getNUniqueReq(int amount);
+
+    public int getNumOfUniqueConn();
+
+    public int getNumOfAllConn();
 }

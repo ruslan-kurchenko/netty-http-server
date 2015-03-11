@@ -4,10 +4,7 @@ import com.henko.server.dao.UniqueReqDao;
 import com.henko.server.db.HikariConnPool;
 import com.henko.server.model.UniqueReq;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,26 +80,76 @@ public class H2UniqueReqDao implements UniqueReqDao {
     }
 
     @Override
-    public void addOrIncrementCount(UniqueReq request) {
-        String ip = request.getIp();
+    public int getNumOfUniqueConn() {
+        String selectStr = "SELECT COUNT(DISTINCT IP) FROM UNIQUE_REQUESTS;";
 
-        if (!(getByIp(ip) == null)) _increaseCountByIp(ip);
+        Connection conn = _pool.getConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(selectStr);
 
-        _insertRequest(request);
+            if (_isEmpty(rs)) return 0;
+
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(rs);
+            close(stmt);
+            close(conn);
+        }
+
+        return 0;
     }
 
-    private void _increaseCountByIp(String ip) {
-        UniqueReq request = getByIp(ip);
+    @Override
+    public int getNumOfAllConn() {
+        String selectStr = "SELECT SUM(COUNT) FROM UNIQUE_REQUESTS;";
 
+        Connection conn = _pool.getConnection();
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(selectStr);
+
+            if (_isEmpty(rs)) return 0;
+
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(rs);
+            close(stmt);
+            close(conn);
+        }
+
+        return 0;
+    }
+
+    @Override
+    public void addOrIncrementCount(UniqueReq request) {
+        UniqueReq present  = getByIp(request.getIp());
+
+        if (present == null) {
+            _insertRequest(request);
+        } else {
+            _incrementCount(present);
+        }
+    }
+
+
+    private void _incrementCount(UniqueReq request) {
         String updateStr = "UPDATE UNIQUE_REQUESTS SET COUNT = ? WHERE IP = ?;";
-        int futureCount = request.getCount() + 1;
 
         Connection conn = _pool.getConnection();
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(updateStr);
-            stmt.setInt(1, futureCount);
-            stmt.setString(2, ip);
+            stmt.setInt(1, request.getCount() + 1);
+            stmt.setString(2, request.getIp());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -113,14 +160,15 @@ public class H2UniqueReqDao implements UniqueReqDao {
     }
 
     private int _insertRequest(UniqueReq request) {
-        String insertStr = "INSERT INTO UNIQUE_REQUESTS (IP, COUNT, LAST_CONN) VALUES(?, 1, ?);";
+        String insertStr = "INSERT INTO UNIQUE_REQUESTS (IP, COUNT, LAST_CONN) VALUES(?, ?, ?);";
 
         Connection conn = _pool.getConnection();
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(insertStr);
             stmt.setString(1, request.getIp());
-            stmt.setLong(2, request.getLastConn());
+            stmt.setInt(2, 1);
+            stmt.setLong(3, request.getLastConn());
             stmt.executeUpdate();
 
             return getByIp(request.getIp()).getId();

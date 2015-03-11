@@ -1,7 +1,9 @@
 package com.henko.server.handler;
 
 import com.henko.server.dao.ConnectDao;
+import com.henko.server.dao.UniqueReqDao;
 import com.henko.server.model.Connect;
+import com.henko.server.model.UniqueReq;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.traffic.ChannelTrafficShapingHandler;
 
@@ -15,6 +17,9 @@ public class ServerTrafficHandler extends ChannelTrafficShapingHandler {
     private ConnectDao _connectDao;
     private Connect _connect;
 
+    private UniqueReqDao _requestDao;
+    private UniqueReq _uniqueReq;
+
     private double _durationMillis;
     private long _receivedBytes;
     private long _sendBytes;
@@ -23,17 +28,20 @@ public class ServerTrafficHandler extends ChannelTrafficShapingHandler {
         super(checkInterval);
     }
 
-    public ServerTrafficHandler(Connect _connect) {
+    public ServerTrafficHandler(Connect connect, UniqueReq uniqueReq) {
         this(CHECK_INTERVAL);
 
         this._connectDao = getDaoFactory(H2).getConnectionDao();
-        this._connect = _connect;
+        this._requestDao = getDaoFactory(H2).getUniqueReqDao();
+        this._connect = connect;
+        this._uniqueReq = uniqueReq;
     }
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         long startConnTimeStamp = System.currentTimeMillis();
         _connect.setTimestamp(startConnTimeStamp);
+        _uniqueReq.setLastConn(startConnTimeStamp);
 
         super.handlerAdded(ctx);
     }
@@ -63,6 +71,7 @@ public class ServerTrafficHandler extends ChannelTrafficShapingHandler {
         _connect.setSpeed(speed);
 
         _connectDao.insertConnect(_connect);
+        _requestDao.addOrIncrementCount(_uniqueReq);
     }
 
     private long _parseDurationMillis(long stopConnTimeStamp) {

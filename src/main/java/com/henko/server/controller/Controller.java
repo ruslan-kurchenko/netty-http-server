@@ -2,6 +2,7 @@ package com.henko.server.controller;
 
 import com.henko.server.dao.ConnectDao;
 import com.henko.server.dao.RedirectDao;
+import com.henko.server.dao.UniqueReqDao;
 import com.henko.server.dao.impl.DaoFactory;
 import com.henko.server.domain.ServerStatus;
 import com.henko.server.model.UniqueReq;
@@ -74,13 +75,16 @@ public class Controller {
     private ServerStatus _prepareServerStatus() {
         ConnectDao connDao = _daoFactory.getConnectionDao();
         RedirectDao redirectDao = _daoFactory.getRedirectDao();
+        UniqueReqDao uniqueReqDao = _daoFactory.getUniqueReqDao();
 
         List<Connect> connList = connDao.getLastNConn(CONNECT_AMOUNT);
-        List<UniqueReq> uniqueReqList = connDao.getNUniqueRequest(UNIQUE_REQ_AMOUNT);
-        int requests = connDao.getNumOfAllConn();
-        int uniqueRequest = connDao.getNumOfUniqueConn();
         int currentConn = connDao.getNumOfCurrentConn();
+
         List<Redirect> redirectList = redirectDao.getNRedirect(REDIRECT_AMOUNT);
+
+        int uniqueRequest = uniqueReqDao.getNumOfUniqueConn();
+        int requests = uniqueReqDao.getNumOfAllConn();
+        List<UniqueReq> uniqueReqList = uniqueReqDao.getNUniqueReq(UNIQUE_REQ_AMOUNT);
 
         return new ServerStatus(requests, uniqueRequest, currentConn, uniqueReqList, connList, redirectList);
     }

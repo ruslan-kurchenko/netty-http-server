@@ -1,6 +1,7 @@
 package com.henko.server.handler;
 
 import com.henko.server.model.Connect;
+import com.henko.server.model.UniqueReq;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -14,15 +15,16 @@ import io.netty.handler.ssl.SslHandler;
 public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private final Connect connect = new Connect();
+    private final UniqueReq request = new UniqueReq();
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ch.pipeline()
-                .addLast(new ServerTrafficHandler(connect))
+                .addLast(new ServerTrafficHandler(connect, request))
                 .addLast(new ServerDataBaseCleaner())
                 .addLast(new ServerConnectionCountHandler())
                 .addLast(new HttpServerCodec())
                 .addLast(new HttpObjectAggregator(512 * 1024))
-                .addLast(new ServerHttpRequestHandler(connect));
+                .addLast(new ServerHttpRequestHandler(connect, request));
     }
 }

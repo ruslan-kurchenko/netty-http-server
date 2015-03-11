@@ -35,6 +35,8 @@ public class TestH2UniqueReqDao {
 
     @Test
     public void testGetByIP() {
+        assertNull(_requestDao.getByIp("555.55.55.55"));
+
         UniqueReq expected = _testData.get(0);
         UniqueReq actual = _requestDao.getByIp("111.11.11.11");
 

@@ -105,62 +105,6 @@ public class H2ConnectDao implements ConnectDao {
     }
 
     @Override
-    public List<UniqueReq> getNUniqueRequest(int amount) {
-        String selectStr = "SELECT SRC_IP, COUNT(SRC_IP), MAX(TIME_STAMP) FROM CONNECTIONS GROUP BY SRC_IP LIMIT ?;";
-
-        Connection conn = _pool.getConnection();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        try {
-            stmt = conn.prepareStatement(selectStr);
-            stmt.setInt(1, amount);
-            rs = stmt.executeQuery();
-
-            if (_isEmpty(rs)) return null;
-
-            return _parseUniqueRequestList(rs);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            close(rs);
-            close(stmt);
-            close(conn);
-        }
-
-        return null;
-    }
-
-    @Override
-    public int getNumOfAllConn() {
-        return ServerConnectionCountHandler.getAllConnCount();
-    }
-
-    @Override
-    public int getNumOfUniqueConn() {
-        String selectStr = "SELECT COUNT(DISTINCT SRC_IP) FROM CONNECTIONS;";
-
-        Connection conn = _pool.getConnection();
-        Statement stmt = null;
-        ResultSet rs = null;
-        try {
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(selectStr);
-
-            if (_isEmpty(rs)) return 0;
-
-            return rs.getInt(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            close(rs);
-            close(stmt);
-            close(conn);
-        }
-
-        return 0;
-    }
-
-    @Override
     public int getNumOfCurrentConn() {
         return ServerConnectionCountHandler.getConnectionCount();
     }
