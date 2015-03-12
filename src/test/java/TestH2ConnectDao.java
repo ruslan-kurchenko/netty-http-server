@@ -55,29 +55,6 @@ public class TestH2ConnectDao {
         assertEquals(new ArrayList<>(asList(_testData.get(1), _testData.get(2))), _connectDao.getLastNConn(2));
     }
 
-//    @Test
-//    public void testGetNUniqueRequests() {
-//        List<UniqueReq> expected = new ArrayList<UniqueReq>(){{
-//            add(new UniqueReq(_testData.get(2).getIp(), 2, _testData.get(2).getTimestamp()));
-//            add(new UniqueReq(_testData.get(0).getIp(), 1, _testData.get(0).getTimestamp()));
-//        }};
-//
-//        List<UniqueReq> actual = _connectDao.getNUniqueRequest(2);
-//
-//        assertEquals(expected, actual);
-//    }
-
-//    @Test
-//    public void testUniqueRequest() {
-//        List<UniqueReq> expected = new ArrayList<UniqueReq>(){{
-//            add(new UniqueReq("222.22.22.22", 2, 3));
-//            add(new UniqueReq("111.11.11.11", 1, 1));
-//        }};
-//
-//        List<UniqueReq> actual = _connectDao.getNUniqueRequest(2);
-//        assertEquals(expected, actual);
-//    }
-
     @Test
     public void testInsertConnect() {
         Connect expected = new Connect(4, "444.44.44.44", "/status", 4, 4, 4, 4);
