@@ -7,6 +7,7 @@ import io.netty.util.internal.chmv8.ConcurrentHashMapV8;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,7 +22,7 @@ public class ServerConnectionCountHandler extends ChannelTrafficShapingHandler {
     private static final int CHECK_INTERVAL = 0;
 
     private static final AtomicInteger CURRENT_CONNECTION_COUNT = new AtomicInteger();
-    private static final Map<String, UniqueReq> UNIQUE_REQUESTS = new ConcurrentHashMap<>();
+    private static final Map<String, UniqueReq> UNIQUE_REQUESTS = new HashMap<>();
 
 
     private ServerConnectionCountHandler(long checkInterval) {
@@ -77,7 +78,7 @@ public class ServerConnectionCountHandler extends ChannelTrafficShapingHandler {
         return UNIQUE_REQUESTS.size();
     }
 
-    private synchronized void _addOrIncrementRequest(UniqueReq request) {
+    private static synchronized void _addOrIncrementRequest(UniqueReq request) {
         String ip = request.getIp();
         long lastConn = request.getLastConn();
 
@@ -89,7 +90,7 @@ public class ServerConnectionCountHandler extends ChannelTrafficShapingHandler {
         }
     }
 
-    private int _getCountByIp(String ip) {
+    private static int _getCountByIp(String ip) {
         return UNIQUE_REQUESTS.get(ip).getCount();
     }
 
