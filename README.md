@@ -15,6 +15,7 @@ store information about them in the data base.
 - [`HttpObjectAggregator`](http://netty.io/4.0/api/io/netty/handler/codec/http/HttpObjectAggregator.html) - provides handle only full HTTP messages and be okay with some memory overhead.
 - [`HttpServerCodec`](http://netty.io/4.0/api/io/netty/handler/codec/http/HttpServerCodec.html) - provides decode HTTP requests from clients/decode HTTP response for clients. 
 
+
 #### `ServerHttpRequestHandler` - provides four situations "how are requests processed?":
 - `http://localhost:{port}/hello` server wait 10 second and that sends response with HTML page which contains "Hello World" string.
 - `http://localhost:{port}/redirect?url=<url>` server redirect client to specified `<url>`.
@@ -37,35 +38,42 @@ and table with information about last connections(by default table have 3, 3, 16
 Also if the path is `/redirect?url=<url>`, the controller can
 prepare a `<url>` for handler. All responses sends the handler.
 
+
 #### `ServerConnectionCountHandler` - concurrent count of connections
 The counter based on [ChannelTrafficShapingHandler](http://netty.io/4.0/api/io/netty/handler/traffic/ChannelTrafficShapingHandler.html).
 It is has two [AtomicInteger](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/atomic/AtomicInteger.html)
 variables: `CURRENT_CONNECTION_COUNT` and `ALL_CONNECTION_COUNT` which count current connections and 
 all connections to server corresponds. Also handler provides two methods that provides getting numbers from this 
 inner counters.
-> This handler has only one public constructor without and arguments. By default inner variable `CHECK_INTERVAL = 0`, it's mean 
-that handler doesn't call with `doAccounting()` method. 
+> This handler has only one public constructor without and arguments. By default inner variable `CHECK_INTERVAL = 0`, it's mean that handler doesn't call with `doAccounting()` method. 
  
+
 
 #### `ServerDataBaseCleaner` - very important handler "why"?
 This handler provides database cleaning. It is the child of [ChannelTrafficShapingHandler](http://netty.io/4.0/api/io/netty/handler/traffic/ChannelTrafficShapingHandler.html). 
 When a method `doAccounting(...)` works, inner [DBManager](https://github.com/henko-okdev/netty-http-server/blob/master/src/main/java/com/henko/server/db/DBManager.java) 
-cleans storage. Also you can configure cleaning interval(`cleanInterval`) and how many rows a cleaner left in table(`leftRows`) 
-via handler constructor. By default `cleanInterval = 1000 milliseconds`, `leftRows = 16`.
+cleans storage. Also you can configure cleaning interval(`cleanInterval`) and how many rows the cleaner left in table(`leftRows`) 
+via handler constructor. By default `cleanInterval = 1000 milliseconds`, `leftRows = 16`, but you can save more rows in storage on your opinion if you want to save more information about last connections.
+
+>Also you can turn off the cleaner if initialize `cleanInterval = 0`, in this case method `doAccounting(...)` and calls.
 
 
 #####A little bit about server storage
 The server uses **[H2DataBase](http://www.h2database.com/)** 
-[in-memory](http://en.wikipedia.org/wiki/In-memory_database) mode to store data about server status. 
-To store and retrieve data server uses **[HikariCP](https://github.com/brettwooldridge/HikariCP)**, 
+[in-memory](http://en.wikipedia.org/wiki/In-memory_database) mode to store data about a server status. 
+To store and retrieve data the server uses **[HikariCP](https://github.com/brettwooldridge/HikariCP)**, 
 it is a "zero-overhead" production ready JDBC connection pool and very comfortable in work.
 Also you can configure server storage by [`~/config/db-config.properties`](https://github.com/henko-okdev/netty-http-server/blob/master/config/db-config.properties). 
-For example - switch DB mode to [embedded](http://www.h2database.com/html/quickstart.html), 
+For example - switch DB mode to [embedded](http://www.h2database.com/html/quickstart.html) and save all server status information in one file, 
 configure path to DB, user name/password, max connection pool size. To provide more flexibility, the server
 have a DAO layer based on the Factory Method design pattern. The DAO layer have two dao interfaces - ConnectDao 
 and RedirectDao implementations of which provide communication with DB([H2ConnectDao](https://github.com/henko-okdev/netty-http-server/blob/master/src/main/java/com/henko/server/dao/impl/H2ConnectDao.java), [H2RedirectDao](https://github.com/henko-okdev/netty-http-server/blob/master/src/main/java/com/henko/server/dao/impl/H2RedirectDao.java)).
+
+>In the [improved server version](https://github.com/henko-okdev/netty-http-server/tree/unquie-req-dao) we are have three DAO.
+
 >Each time before the server start, [DBManager](https://github.com/henko-okdev/netty-http-server/blob/master/src/main/java/com/henko/server/db/DBManager.java)
 prepares the database.
+
 
 #### `ServerTrafficHandler` - count server I/O data
 This counter specialized on counting received and sent data by server. Also handler calculates the speed of each 
@@ -73,18 +81,19 @@ connection and stores all data in the database using [H2ConnectDao](https://gith
 > This handler has only one public constructor without and arguments. By default inner variable `CHECK_INTERVAL = 0`, it's mean
 that handler doesn't call with `doAccounting()` method.
 
+
 ####Additional
 **The Server has two branches:**
 
 - `master` - implementation totally based on data base, so we can't get all unique requests via saving all connections to data 
 base, after a little bit time server will start work very slowly. But in this case we can get all number of connections correctly, 
 ofc. it's it my implementation, and ofc. it's not best way.
-- `unique-request-dao` - in this case I implemented count number of unique request via [`HashMap`](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentHashMap.html) 
+- `unique-request-dao` - in this case I had implemented count number of unique request via [`HashMap`](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentHashMap.html) 
  and one synchronized method, so now we may see correct unique requests counting. To do that I changed `ServerConnectionCountHandler` and create new DAO - [`UniqueReqDao`](https://github.com/henko-okdev/netty-http-server/blob/unquie-req-dao/src/main/java/com/henko/server/dao/UniqueReqDao.java) 
-for more flexibility.
+for more flexibility. This DAO gets all information about unique requests to the server from `ServerConnectionCountHandler`. 
 
 >In folder [`~/screenshots`](https://github.com/henko-okdev/netty-http-server/tree/unquie-req-dao/screenshots) 
-you can find results of server test for two cases which was considered above.
+you can find results of the server test for two cases which was considered above.
 
 **Also server has some classes helpers:**
 
