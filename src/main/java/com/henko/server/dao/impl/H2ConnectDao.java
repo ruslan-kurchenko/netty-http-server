@@ -9,11 +9,14 @@ import com.henko.server.model.Connect;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.henko.server.db.DBUtil.close;
 
 public class H2ConnectDao implements ConnectDao {
     private HikariConnPool _pool;
+
+    private final static AtomicInteger LAST_INSERTED_ID = new AtomicInteger();
 
     public H2ConnectDao() {
         _pool = HikariConnPool.getConnPool();
@@ -72,22 +75,22 @@ public class H2ConnectDao implements ConnectDao {
 
     @Override
     public List<Connect> getLastNConn(int amount) {
-        String selectStr = "" +
-                "SELECT * " +
-                "FROM (" +
-                "       SELECT TOP(?) * " +
-                "       FROM CONNECTIONS " +
-                "       ORDER BY ID_CONNECTION DESC" +
-                "     ) AS tbl " +
-                "ORDER BY tbl.ID_CONNECTION ASC;";
+        if (LAST_INSERTED_ID.get() == 0) return null;
 
+        int last = LAST_INSERTED_ID.get();
+        int first = 0;
+
+        if (!(LAST_INSERTED_ID.get() < amount)) first = LAST_INSERTED_ID.get() - amount;
+
+        String selectStr = "SELECT * FROM CONNECTIONS WHERE ID_CONNECTION  BETWEEN ? AND ? ORDER BY ID_CONNECTION;";
 
         Connection conn = _pool.getConnection();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             stmt = conn.prepareStatement(selectStr);
-            stmt.setInt(1, amount);
+            stmt.setInt(1, first);
+            stmt.setInt(2, last);
             rs = stmt.executeQuery();
 
             if (_isEmpty(rs)) return null;
@@ -117,8 +120,9 @@ public class H2ConnectDao implements ConnectDao {
 
         Connection conn = _pool.getConnection();
         PreparedStatement stmt = null;
+        ResultSet rs = null;
         try {
-            stmt = conn.prepareStatement(insertStr);
+            stmt = conn.prepareStatement(insertStr, Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, connect.getIp());
             stmt.setString(2, connect.getUri());
             stmt.setLong(3, connect.getTimestamp());
@@ -127,9 +131,15 @@ public class H2ConnectDao implements ConnectDao {
             stmt.setLong(6, connect.getSpeed());
             stmt.executeUpdate();
 
+            rs = stmt.getGeneratedKeys();
+
+            if (_isEmpty(rs)) return;
+
+            LAST_INSERTED_ID.set(rs.getInt(1));
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            close(rs);
             close(stmt);
             close(conn);
         }
