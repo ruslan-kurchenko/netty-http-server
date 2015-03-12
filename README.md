@@ -87,8 +87,8 @@ that handler doesn't call with `doAccounting()` method.
 
 - `master` - implementation totally based on data base, so we can't get all unique requests via saving all connections to data 
 base, after a little bit time server will start work very slowly. But in this case we can get all number of connections correctly, 
-ofc. it's it my implementation, and ofc. it's not best way.
-- `unique-request-dao` - in this case I had implemented count number of unique request via [`HashMap`](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentHashMap.html) 
+ofc. it's in my implementation, and ofc. it's not best way.
+- `unique-request-dao` - *(improved version)* in this case I had implemented count number of unique request via [`HashMap`](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ConcurrentHashMap.html) 
  and one synchronized method, so now we may see correct unique requests counting. To do that I changed `ServerConnectionCountHandler` and create new DAO - [`UniqueReqDao`](https://github.com/henko-okdev/netty-http-server/blob/unquie-req-dao/src/main/java/com/henko/server/dao/UniqueReqDao.java) 
 for more flexibility. This DAO gets all information about unique requests to the server from `ServerConnectionCountHandler`. 
 
