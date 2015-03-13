@@ -55,7 +55,7 @@ When a method `doAccounting(...)` works, inner [DBManager](https://github.com/he
 cleans storage. Also you can configure cleaning interval(`cleanInterval`) and how many rows the cleaner left in table(`leftRows`) 
 via handler constructor. By default `cleanInterval = 1000 milliseconds`, `leftRows = 16`, but you can save more rows in storage on your opinion if you want to save more information about last connections.
 
->Also you can turn off the cleaner if initialize `cleanInterval = 0`, in this case method `doAccounting(...)` and calls.
+>Also you can turn off the cleaner if initialize `cleanInterval = 0`, in this case method `doAccounting(...)` and do not calls.
 
 
 #####A little bit about server storage
